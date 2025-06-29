@@ -1,0 +1,90 @@
+package com.anonymouslyfast.basicCustomShop;
+
+import com.anonymouslyfast.basicCustomShop.commands.ShopCommand;
+import com.anonymouslyfast.basicCustomShop.commands.ShopManagerCommand;
+import com.anonymouslyfast.basicCustomShop.listeners.InventoryCloseListener;
+import com.anonymouslyfast.basicCustomShop.listeners.ShopClickListener;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPIBukkitConfig;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public final class BasicCustomShops extends JavaPlugin {
+
+    private static BasicCustomShops instance;
+    public static BasicCustomShops getInstance() {return instance;}
+
+    public String messagePrefix = getConfig().getString("message-prefix");
+
+
+    public void customReloadConfig() {
+        saveDefaultConfig();
+        reloadConfig();
+
+        messagePrefix = getConfig().getString("message-prefix");
+    }
+
+    public boolean shopIsEnabled;
+    public void changeShopBoolean(boolean bool) {
+        shopIsEnabled = bool;
+        getConfig().set("shop-enabled", bool);
+        saveConfig();
+        reloadConfig();
+    }
+
+
+
+
+    @Override
+    public void onLoad() {
+        getLogger().info("Loading CommandAPI..");
+        CommandAPI.onLoad(new CommandAPIBukkitConfig(this));
+        if (!CommandAPI.isLoaded()) {
+            getLogger().severe("CommandAPI is not loaded, contact developer.");
+            PluginManager pm = getServer().getPluginManager();
+            pm.disablePlugin(this);
+        }
+    }
+
+    @Override
+    public void onEnable() {
+        customReloadConfig();
+        instance = this;
+
+        shopIsEnabled = getConfig().getBoolean("shop-enabled");
+
+        if (CommandAPI.isLoaded()) {
+            CommandAPI.onEnable();
+            registerCommands();
+            registerListeners();
+        }
+
+    }
+
+    private void registerCommands() {
+        CommandAPI.registerCommand(ShopCommand.class);
+        CommandAPI.registerCommand(ShopManagerCommand.class);
+    }
+
+    private void registerListeners() {
+        PluginManager pm = getServer().getPluginManager();
+
+        pm.registerEvents(new SubShopCreation(), this);
+        pm.registerEvents(new InventoryCloseListener(), this);
+        pm.registerEvents(new ShopClickListener(), this);
+    }
+
+
+    @Override
+    public void onDisable() {
+        if (CommandAPI.isLoaded()) {
+            CommandAPI.getRegisteredCommands().forEach(command -> {
+               CommandAPI.unregister(command.commandName());
+            });
+            getLogger().info("Unloaded registered commands. Disabling CommandAPI...");
+            CommandAPI.onDisable();
+        }
+    }
+
+
+}
