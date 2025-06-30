@@ -19,31 +19,31 @@ public class ShopClickListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        String title = config.getString("shop-title");
+        Customer customer = Shop.getCustomer(event.getWhoClicked().getUniqueId());
+        if (customer == null) return;
+        String title = config.getString("shop-title") + " &7(" + customer.getPage() + ")";
         if (!event.getView().getTitle().equals(Messages.convertCodes(title))) return;
         event.setCancelled(true);
 
         Player player = (Player) event.getWhoClicked();
-        Customer customer = Shop.getCustomer(player);
-        if (customer == null) return;
 
-        if (event.getSlot() == 44) {
-            if (event.getClickedInventory().getItem(44).getType() == Material.BARRIER) {
-                player.closeInventory();
-                return;
-            } else {
+        if (event.getSlot() == 45) { // Previous page / Back to Shop
+            if (event.getClickedInventory().getItem(45).getType() != Material.BARRIER) {
                 customer.switchInventory(Shop.getShopInventory(player, customer.getPage()-1));
-                return;
+            } else {
+                player.closeInventory();
+                Shop.removeCustomer(customer);
             }
-        } else if (event.getSlot() == 54) {
-            if (event.getClickedInventory().getItem(54).getType() != Material.ARROW) return;
+            return;
+        } else if (event.getSlot() == 53) { // Next Page
+            if (event.getClickedInventory().getItem(53).getType() != Material.ARROW) return;
             customer.switchInventory(Shop.getShopInventory(player, customer.getPage()+1));
             return;
         }
 
         SubShop clickedSubShop = customer.getSubShopFromSlot(event.getSlot());
         if (clickedSubShop == null) return;
-        customer.switchInventory(Shop.getSubShopInventory(clickedSubShop, 1));
+        customer.switchInventory(Shop.getSubShopInventory(clickedSubShop, 1)); // Clicked on subshop
 
     }
 

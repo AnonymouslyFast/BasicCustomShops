@@ -1,13 +1,15 @@
 package com.anonymouslyfast.basicCustomShop;
 
-import org.bukkit.entity.Player;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
+import java.util.Objects;
+import java.util.UUID;
 
 public class Customer {
 
-    private final Player player;
+    private final UUID playerUUID;
     private Inventory inventory;
     private Inventory previousInventory;
 
@@ -16,18 +18,17 @@ public class Customer {
     private final HashMap<Integer, SubShop> subShopSlots = new HashMap<>();
 
 
-    public Customer(Player player) {
-        this.player = player;
-        this.inventory = Shop.getShopInventory(player);
+    public Customer(UUID playerUUID) {
+        this.playerUUID = playerUUID;
     }
 
-    public Customer(Player player, Inventory inventory) {
-        this.player = player;
+    public Customer(UUID playerUUID, Inventory inventory) {
+        this.playerUUID = playerUUID;
         this.inventory = inventory;
     }
 
-    public Player getPlayer() {
-        return player;
+    public UUID getPlayerUUID() {
+        return playerUUID;
     }
 
     public Inventory getInventory() {
@@ -37,7 +38,7 @@ public class Customer {
     public void switchInventory(Inventory inventory) {
         this.inventory = inventory;
         previousInventory = this.inventory;
-        player.openInventory(inventory);
+        Objects.requireNonNull(Bukkit.getPlayer(playerUUID)).openInventory(inventory);
     }
 
     public SubShop getSubShopFromSlot(Integer slot) {

@@ -13,17 +13,18 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class Shop {
     private static final FileConfiguration config = BasicCustomShops.getInstance().getConfig();
 
     private static List<SubShop> subShops = new ArrayList<>();
-    private final static List<String> subShopNames = new ArrayList<>();
+    private final static HashMap<String, SubShop> subShopNames = new HashMap<>();
 
-    private final static HashMap<Player, Customer> currentCustomers = new HashMap<>();
-    public static void addCustomer(Customer customer) {currentCustomers.put(customer.getPlayer(), customer);}
-    public static void removeCustomer(Customer customer) {currentCustomers.remove(customer.getPlayer());}
-    public static Customer getCustomer(Player player) {return currentCustomers.get(player);}
+    private final static HashMap<UUID, Customer> currentCustomers = new HashMap<>();
+    public static void addCustomer(Customer customer) {currentCustomers.put(customer.getPlayerUUID(), customer);}
+    public static void removeCustomer(Customer customer) {currentCustomers.remove(customer.getPlayerUUID());}
+    public static Customer getCustomer(UUID uuid) {return currentCustomers.get(uuid);}
 
 
     private final static List<Integer> subShopSlots = List.of(10, 12, 14, 16, 19, 21, 23, 25, 28, 30, 32, 34, 36, 39, 41, 43);
@@ -39,21 +40,23 @@ public class Shop {
         }
     }
 
+    private final static int maxProductsPerPage = 28;
+    private final static int endOfContainer = 44;
+    private final static int startOfContainer = 10;
+
     public static Inventory getSubShopInventory(SubShop subShop, int page) {
-        String title = config.getString("shop.title") + " &7| " + subShop.getName();
+        String title = subShop.getName() + " &7(" + page + ")";
         Inventory inventory = Bukkit.createInventory(null, 54, Messages.convertCodes(title));
         fillInventory(inventory);
-        if (subShop.getProducts() != null || !subShop.getProducts().isEmpty()) {
-            int startingSlot = 10;
-            int endingSlot = 44;
-            int currentSlot = startingSlot;
+        if (subShop.getProducts().isEmpty()) {
+            int currentSlot = startOfContainer;
             int index = 0;
             for (Product product : subShop.getProducts()) {
-                if (index >= 28*page) {
-                    if (currentSlot == 17) currentSlot = 19;
-                    if (currentSlot == 26) currentSlot = 28;
-                    if (currentSlot == 35) currentSlot = 37;
-                    if (currentSlot == endingSlot) break;
+                BasicCustomShops.getInstance().getLogger().info(Integer.toString(index));
+                if (index >= maxProductsPerPage*page) {
+                    BasicCustomShops.getInstance().getLogger().info("Passed " +  currentSlot);
+                    if ((currentSlot + 1) % 9 == 0) currentSlot += 2;
+                    if (currentSlot >= endOfContainer) break;
 
                     ItemStack item =  product.getItem();
                     ItemMeta meta = item.getItemMeta();
@@ -71,6 +74,8 @@ public class Shop {
                 index++;
                 currentSlot++;
             }
+        } else {
+            BasicCustomShops.getInstance().getLogger().info("Empty");
         }
 
         // Close
@@ -115,27 +120,26 @@ public class Shop {
     }
 
     public static Inventory getShopInventory(Player player, int page) {
-        String title = config.getString("shop.title");
+        String title = config.getString("shop-title") + " &7(" + page + ")";
         if (title == null || title.isEmpty()) {title = "&a&lShop";}
         Inventory inventory = Bukkit.createInventory(null, 54, Messages.convertCodes(title));
         fillInventory(inventory);
         if (!subShops.isEmpty()) {
-            int index = 0;
             int passedLoops = 0;
-            for (SubShop subShop : subShops) {
-                if (index >= subShopSlots.size()*page || passedLoops < subShopSlots.size()) {
+            int startIndex = subShops.size()*(page-1);
+            for (int i = 0; i < subShops.size(); i++) {
+                if (i >= startIndex && passedLoops < subShopSlots.size()) {
+                    SubShop subShop = subShops.get(i);
                     ItemStack itemStack = new ItemStack(subShop.getIcon());
                     ItemMeta meta = itemStack.getItemMeta();
-                    assert meta != null;
                     meta.setDisplayName(Messages.convertCodes("&f" + subShop.getName()));
                     meta.setLore(List.of(Messages.convertCodes("&7Click to open this subshop.")));
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                     itemStack.setItemMeta(meta);
                     inventory.setItem(subShopSlots.get(passedLoops), itemStack);
-                    Shop.getCustomer(player).addSubShopSlot(subShopSlots.get(passedLoops), subShop);
+                    Shop.getCustomer(player.getUniqueId()).addSubShopSlot(subShopSlots.get(passedLoops), subShop);
                     passedLoops++;
                 }
-                index++;
             }
         }
 
@@ -178,7 +182,7 @@ public class Shop {
         inventory.setItem(49, itemStack);
 
         // Setting Customer stuff
-        Customer customer = Shop.getCustomer(player);
+        Customer customer = Shop.getCustomer(player.getUniqueId());
         if (customer == null) return inventory;
         customer.setPage(page);
 
@@ -190,14 +194,22 @@ public class Shop {
         return subShops;
     }
 
+    public static void removeSubShop(String name) {
+        subShops.remove(getSubShopFromName(name));
+    }
+
     public static boolean isSubshopNameTaken(String name) {
-        return subShopNames.contains(name);
+        return subShopNames.containsKey(name);
+    }
+
+    public static SubShop getSubShopFromName(String name) {
+        return subShopNames.get(name);
     }
 
 
     public static void addSubShop(SubShop subShop) {
         subShops.add(subShop);
-        subShopNames.add(subShop.getName());
+        subShopNames.put(subShop.getName(), subShop);
     }
 
     public static void setSubShops(List<SubShop> subShops) {

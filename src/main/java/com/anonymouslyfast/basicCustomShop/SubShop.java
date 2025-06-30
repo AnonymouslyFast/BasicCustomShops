@@ -2,6 +2,7 @@ package com.anonymouslyfast.basicCustomShop;
 
 import org.bukkit.Material;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public class SubShop {
     private final String name;
     private final UUID uuid;
 
-    private List<Product> products;
+    private List<Product> products = new ArrayList<>();
 
     public SubShop(String name, Material icon) {
         this.name = name;

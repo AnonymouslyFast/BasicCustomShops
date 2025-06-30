@@ -2,19 +2,16 @@ package com.anonymouslyfast.basicCustomShop.listeners;
 
 import com.anonymouslyfast.basicCustomShop.Customer;
 import com.anonymouslyfast.basicCustomShop.Shop;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-public class InventoryCloseListener implements Listener {
+public class QuitListener implements Listener {
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        Player player = (Player) event.getPlayer();
-        Customer customer = Shop.getCustomer(player.getUniqueId());
+    public void onQuit(PlayerQuitEvent event) {
+        Customer customer = Shop.getCustomer(event.getPlayer().getUniqueId());
         if (customer == null) return;
         Shop.removeCustomer(customer);
     }
-
 }

@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -48,6 +49,11 @@ public class SubShopCreation implements Listener {
             currentPlayers.remove(player);
             player.sendMessage(Messages.getMessage("&aRemoved you from the subshop creator."));
         }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        currentPlayers.remove(e.getPlayer());
     }
 
 

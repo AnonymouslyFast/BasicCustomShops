@@ -9,6 +9,7 @@ import dev.jorel.commandapi.annotations.Default;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 @Command("shop")
 public class ShopCommand {
@@ -26,9 +27,10 @@ public class ShopCommand {
             return;
         }
         Player player = (Player) sender;
-        Customer customer = new Customer(player);
+        Customer customer = new Customer(player.getUniqueId());
         Shop.addCustomer(customer);
-        player.openInventory(customer.getInventory());
+        Inventory inventory = Shop.getShopInventory(player);
+        customer.switchInventory(inventory);
     }
 
 }

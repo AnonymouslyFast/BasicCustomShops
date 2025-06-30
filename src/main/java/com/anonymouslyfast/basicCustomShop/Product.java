@@ -3,6 +3,8 @@ package com.anonymouslyfast.basicCustomShop;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
+
 public class Product {
 
     private final ItemStack item;
@@ -12,6 +14,10 @@ public class Product {
     public Product(ItemStack item, double price) {
         this.item = item;
         this.price = price;
+    }
+
+    public Product(ItemStack item) {
+        this.item = item;
     }
 
 

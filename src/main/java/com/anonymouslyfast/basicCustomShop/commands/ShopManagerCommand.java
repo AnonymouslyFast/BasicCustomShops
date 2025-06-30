@@ -1,6 +1,7 @@
 package com.anonymouslyfast.basicCustomShop.commands;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
+import com.anonymouslyfast.basicCustomShop.ProductCreation;
 import com.anonymouslyfast.basicCustomShop.Shop;
 import com.anonymouslyfast.basicCustomShop.SubShopCreation;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
@@ -8,6 +9,7 @@ import dev.jorel.commandapi.annotations.Command;
 import dev.jorel.commandapi.annotations.Default;
 import dev.jorel.commandapi.annotations.Permission;
 import dev.jorel.commandapi.annotations.Subcommand;
+import dev.jorel.commandapi.annotations.arguments.ADoubleArgument;
 import dev.jorel.commandapi.annotations.arguments.AStringArgument;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +26,8 @@ public class ShopManagerCommand {
                   &8- &f/shopmanager help &7- Shows this message.\s
                   &8- &f/shopmanager reload &7- Reloads config\s
                   &8- &f/shopmanager toggleshop &7- Enables/Disables the shop\s
-                  &8- &f/shopmanager createsubshop [SubShopName] &7- Starts the subshop creation process.""";
+                  &8- &f/shopmanager createsubshop [SubShopName] &7- Starts the subshop creation process.\s
+                  &8- &f/shopmanager createproduct [SubShopName] &7- Starts the product creation process.""";
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', helpMessage));
     }
 
@@ -66,6 +69,20 @@ public class ShopManagerCommand {
         }
         Player player = (Player) sender;
         SubShopCreation.addPlayer(player, name);
+    }
+
+    @Subcommand("createproduct")
+    public static void createProduct(CommandSender sender, @AStringArgument String SubShopName) {
+        if (sender instanceof ConsoleCommandSender) {
+            sender.sendMessage(Messages.getMessage("&cOnly players can use this command!"));
+            return;
+        }
+        if (!Shop.isSubshopNameTaken(SubShopName)) {
+            sender.sendMessage(Messages.getMessage("&cThis name is not a name of a subshop!"));
+            return;
+        }
+        Player player = (Player) sender;
+        ProductCreation.addPlayer(player, Shop.getSubShopFromName(SubShopName));
     }
 
 

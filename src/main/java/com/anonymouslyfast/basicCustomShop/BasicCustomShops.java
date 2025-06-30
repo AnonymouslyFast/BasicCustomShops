@@ -3,6 +3,7 @@ package com.anonymouslyfast.basicCustomShop;
 import com.anonymouslyfast.basicCustomShop.commands.ShopCommand;
 import com.anonymouslyfast.basicCustomShop.commands.ShopManagerCommand;
 import com.anonymouslyfast.basicCustomShop.listeners.InventoryCloseListener;
+import com.anonymouslyfast.basicCustomShop.listeners.QuitListener;
 import com.anonymouslyfast.basicCustomShop.listeners.ShopClickListener;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
@@ -72,6 +73,8 @@ public final class BasicCustomShops extends JavaPlugin {
         pm.registerEvents(new SubShopCreation(), this);
         pm.registerEvents(new InventoryCloseListener(), this);
         pm.registerEvents(new ShopClickListener(), this);
+        pm.registerEvents(new QuitListener(), this);
+        pm.registerEvents(new ProductCreation(), this);
     }
 
 
