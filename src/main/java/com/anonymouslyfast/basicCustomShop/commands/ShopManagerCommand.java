@@ -82,7 +82,7 @@ public class ShopManagerCommand {
             return;
         }
         Player player = (Player) sender;
-        ProductCreation.addPlayer(player, Shop.getSubShopFromName(SubShopName));
+        ProductCreation.addPlayer(player, SubShopName);
     }
 
 

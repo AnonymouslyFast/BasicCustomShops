@@ -15,7 +15,7 @@ public class Customer {
 
     private Integer page;
 
-    private final HashMap<Integer, SubShop> subShopSlots = new HashMap<>();
+    private final HashMap<Integer, String> subShopSlots = new HashMap<>();
 
 
     public Customer(UUID playerUUID) {
@@ -42,10 +42,10 @@ public class Customer {
     }
 
     public SubShop getSubShopFromSlot(Integer slot) {
-        return subShopSlots.get(slot);
+        return Shop.getSubShopFromName(subShopSlots.get(slot));
     }
 
-    public void addSubShopSlot(Integer slot, SubShop subShop) {
+    public void addSubShopSlot(Integer slot, String subShop) {
         subShopSlots.put(slot, subShop);
     }
 

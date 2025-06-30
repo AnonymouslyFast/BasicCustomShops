@@ -14,11 +14,11 @@ import java.util.HashMap;
 
 public class ProductCreation implements Listener {
 
-    private final static HashMap<Player, SubShop> currentPlayers = new HashMap<>();
+    private final static HashMap<Player, String> currentPlayers = new HashMap<>();
     private final static HashMap<Player, Product> currentProducts = new HashMap<>();
     private final static HashMap<Player, Integer> stages = new HashMap<>();
 
-    public static void addPlayer(Player player, SubShop subShop) {
+    public static void addPlayer(Player player, String subShop) {
         currentPlayers.put(player, subShop);
         stages.put(player, 1);
         player.sendMessage(Messages.getMessage("&fPlease &7right click while holding a item &fthat your would like to sell in this subshop"));
@@ -100,19 +100,13 @@ public class ProductCreation implements Listener {
     }
 
     private static void complete(Player player) {
-        SubShop subShop = currentPlayers.get(player);
         Product product = currentProducts.get(player);
 
-        player.sendMessage(Messages.getMessage("&aCreated a new product for subshop &f" + subShop.getName()
+        player.sendMessage(Messages.getMessage("&aCreated a new product for subshop &f" + currentPlayers.get(player)
         + "\n&a" +  product.getItem().getType() + "\n  &7Buy: " + product.getPrice() + "\n  &7Sell: " + product.getSellPrice()
         ));
 
-        subShop.addProduct(product);
-        Shop.removeSubShop(subShop.getName());
-        Shop.addSubShop(subShop);
-        BasicCustomShops.getInstance().getLogger().info(" ");
-        BasicCustomShops.getInstance().getLogger().info(subShop.getProducts().toString());
-        BasicCustomShops.getInstance().getLogger().info(Shop.getSubShopFromName(subShop.getName()).getProducts().toString());
+        Shop.getSubShopFromName(currentPlayers.get(player)).addProduct(product);
 
         currentPlayers.remove(player);
         currentProducts.remove(player);

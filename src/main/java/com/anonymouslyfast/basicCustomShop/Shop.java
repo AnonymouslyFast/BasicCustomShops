@@ -48,13 +48,11 @@ public class Shop {
         String title = subShop.getName() + " &7(" + page + ")";
         Inventory inventory = Bukkit.createInventory(null, 54, Messages.convertCodes(title));
         fillInventory(inventory);
-        if (subShop.getProducts().isEmpty()) {
+        if (!subShop.getProducts().isEmpty()) {
             int currentSlot = startOfContainer;
             int index = 0;
             for (Product product : subShop.getProducts()) {
-                BasicCustomShops.getInstance().getLogger().info(Integer.toString(index));
-                if (index >= maxProductsPerPage*page) {
-                    BasicCustomShops.getInstance().getLogger().info("Passed " +  currentSlot);
+                if (index >= maxProductsPerPage*(page-1)) {
                     if ((currentSlot + 1) % 9 == 0) currentSlot += 2;
                     if (currentSlot >= endOfContainer) break;
 
@@ -64,6 +62,7 @@ public class Shop {
                     List<String> lore = new ArrayList<>();
                     lore.add(Messages.convertCodes("&7Costs: &2&l$&f" + product.getPrice()));
                     if (product.getSellPrice() != null) lore.add(Messages.convertCodes("&7Sell: &2&l$&f" + product.getSellPrice()));
+                    lore.add(Messages.convertCodes("&8&l&m-----------------"));
                     lore.add(Messages.convertCodes("&7Left Click &fto buy."));
                     lore.add(Messages.convertCodes("&7SHIFT + Left Click &fto buy multiple."));
                     if (product.getSellPrice() != null) lore.add(Messages.convertCodes("&7Right click &fto sell."));
@@ -137,7 +136,7 @@ public class Shop {
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                     itemStack.setItemMeta(meta);
                     inventory.setItem(subShopSlots.get(passedLoops), itemStack);
-                    Shop.getCustomer(player.getUniqueId()).addSubShopSlot(subShopSlots.get(passedLoops), subShop);
+                    Shop.getCustomer(player.getUniqueId()).addSubShopSlot(subShopSlots.get(passedLoops), subShop.getName());
                     passedLoops++;
                 }
             }
