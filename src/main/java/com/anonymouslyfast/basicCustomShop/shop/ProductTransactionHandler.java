@@ -1,5 +1,6 @@
 package com.anonymouslyfast.basicCustomShop.shop;
 
+import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.hooks.VaultHook;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -70,7 +71,7 @@ public class ProductTransactionHandler implements Listener {
         }
 
         player.sendMessage(Messages.getMessage("&aYou have successfully purchased &7" + amount + " &aof &7" +
-                itemStack.getType().name() + " &afor &2&l&" + price + "&a! &fYour new balance is: &2&l$" + economyResponse.balance));
+                itemStack.getType().name() + " &afor &2&l" + price + "&a! &fYour new balance is: &2&l$" + economyResponse.balance));
 
         HashMap<Integer, ItemStack> cantHold = player.getInventory().addItem(itemStack);
         if (!cantHold.isEmpty()) {
@@ -104,7 +105,7 @@ public class ProductTransactionHandler implements Listener {
             return;
         }
         player.sendMessage(Messages.getMessage("&aYou have successfully sold &7" + amount + " &aof &7" +
-                itemStack.getType().name() + " &aand made &2&l&" + price + "&a! &fYour new balance is: &2&l$" + economyResponse.balance));
+                itemStack.getType().name() + " &aand made &2&l" + price + "&a! &fYour new balance is: &2&l$" + economyResponse.balance));
         player.getInventory().remove(itemStack);
     }
     public static void sell(Customer customer, Product product) { sell(customer, product, 1); }
@@ -147,7 +148,7 @@ public class ProductTransactionHandler implements Listener {
             if  (parsedMessage == null) return;
 
             ProductTransactionHandler.buy(customer, currentBuyingPlayers.get(player.getUniqueId()), parsedMessage);
-            player.openInventory(Shop.getCustomer(player.getUniqueId()).getInventory());
+            Bukkit.getScheduler().callSyncMethod(BasicCustomShops.getInstance(), () -> player.openInventory(Shop.getCustomer(player.getUniqueId()).getInventory()));
             currentBuyingPlayers.remove(player.getUniqueId());
 
         // Selling
@@ -159,7 +160,7 @@ public class ProductTransactionHandler implements Listener {
             if  (parsedMessage == null) return;
 
             ProductTransactionHandler.sell(customer, currentSellingPlayers.get(player.getUniqueId()), parsedMessage);
-            player.openInventory(Shop.getCustomer(player.getUniqueId()).getInventory());
+            Bukkit.getScheduler().callSyncMethod(BasicCustomShops.getInstance(), () -> player.openInventory(Shop.getCustomer(player.getUniqueId()).getInventory()));
             currentSellingPlayers.remove(player.getUniqueId());
         }
     }

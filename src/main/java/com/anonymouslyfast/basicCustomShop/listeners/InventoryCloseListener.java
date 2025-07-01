@@ -16,7 +16,7 @@ public class InventoryCloseListener implements Listener {
         Player player = (Player) event.getPlayer();
         Customer customer = Shop.getCustomer(player.getUniqueId());
         if (customer == null) return;
-        if (event.getInventory() == customer.getPreviousInventory()) return;
+        if (customer.isSwitchingInventory()) {customer.setSwitchingInventory(false); return;}
         if (ProductTransactionHandler.containsPlayer(player.getUniqueId())) return;
         BasicCustomShops.getInstance().getLogger().info("removed on closed!");
         Shop.removeCustomer(customer);

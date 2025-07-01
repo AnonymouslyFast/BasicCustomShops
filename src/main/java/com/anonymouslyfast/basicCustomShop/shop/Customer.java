@@ -1,5 +1,6 @@
 package com.anonymouslyfast.basicCustomShop.shop;
 
+import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 
@@ -22,6 +23,8 @@ public class Customer {
     private final HashMap<Integer, String> subShopSlots = new HashMap<>();
     private final HashMap<Integer, Product> productSlots = new HashMap<>();
 
+    private boolean isSwitchingInventory = false;
+
 
     public Customer(UUID playerUUID) {
         this.playerUUID = playerUUID;
@@ -43,7 +46,8 @@ public class Customer {
     public void switchInventory(Inventory inventory) {
         this.inventory = inventory;
         previousInventory = this.inventory;
-        Objects.requireNonNull(Bukkit.getPlayer(playerUUID)).openInventory(inventory);
+        isSwitchingInventory = true;
+        Bukkit.getScheduler().callSyncMethod(BasicCustomShops.getInstance(), () -> Objects.requireNonNull(Bukkit.getPlayer(playerUUID)).openInventory(inventory));
     }
 
     public SubShop getSubShopFromSlot(Integer slot) {
@@ -90,4 +94,10 @@ public class Customer {
         productSlots.clear();
     }
 
+    public boolean isSwitchingInventory() {
+        return isSwitchingInventory;
+    }
+    public void setSwitchingInventory(boolean isSwitchingInventory) {
+        this.isSwitchingInventory = isSwitchingInventory;
+    }
 }

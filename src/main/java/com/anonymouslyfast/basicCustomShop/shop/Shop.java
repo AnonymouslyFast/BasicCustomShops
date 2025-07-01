@@ -49,7 +49,6 @@ public class Shop {
         String title = subShop.getName() + " &7(" + page + ")";
         Inventory inventory = Bukkit.createInventory(null, 54, Messages.convertCodes(title));
         Customer customer = currentCustomers.get(player.getUniqueId());
-        customer.setOpenedSubShop(subShop);
         fillInventory(inventory);
         if (!subShop.getProducts().isEmpty()) {
             int currentSlot = startOfContainer;
@@ -61,16 +60,17 @@ public class Shop {
 
                     ItemStack item =  product.getItem();
                     ItemMeta meta = item.getItemMeta();
-                    assert meta != null;
-                    List<String> lore = new ArrayList<>();
-                    lore.add(Messages.convertCodes("&7Costs: &2&l$&f" + product.getPrice()));
-                    if (product.getSellPrice() != null) lore.add(Messages.convertCodes("&7Sell: &2&l$&f" + product.getSellPrice()));
-                    lore.add(Messages.convertCodes("&8&l&m-----------------"));
-                    lore.add(Messages.convertCodes("&7Left Click &fto buy."));
-                    lore.add(Messages.convertCodes("&7SHIFT + Left Click &fto buy multiple."));
-                    if (product.getSellPrice() != null) lore.add(Messages.convertCodes("&7Right click &fto sell."));
-                    meta.setLore(lore);
-                    item.setItemMeta(meta);
+                    if (meta != null) {
+                        List<String> lore = new ArrayList<>();
+                        lore.add(Messages.convertCodes("&7Costs: &2&l$&f" + product.getPrice()));
+                        if (product.getSellPrice() != null) lore.add(Messages.convertCodes("&7Sell: &2&l$&f" + product.getSellPrice()));
+                        lore.add(Messages.convertCodes("&8&l&m-----------------"));
+                        lore.add(Messages.convertCodes("&7Left Click &fto buy."));
+                        lore.add(Messages.convertCodes("&7SHIFT + Left Click &fto buy multiple."));
+                        if (product.getSellPrice() != null) lore.add(Messages.convertCodes("&7Right click &fto sell."));
+                        meta.setLore(lore);
+                        item.setItemMeta(meta);
+                    }
                     inventory.setItem(currentSlot, item);
                     customer.addProductSlot(currentSlot, product);
                 }
@@ -116,6 +116,8 @@ public class Shop {
         meta.setLore(List.of(Messages.convertCodes("&7Coming soon")));
         itemStack.setItemMeta(meta);
         inventory.setItem(49, itemStack);
+
+        customer.setOpenedSubShop(subShop);
 
         return inventory;
     }

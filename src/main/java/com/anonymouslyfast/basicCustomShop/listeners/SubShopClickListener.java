@@ -17,22 +17,14 @@ public class SubShopClickListener implements Listener {
 
         Player player = (Player) event.getWhoClicked();
         Customer customer = Shop.getCustomer(player.getUniqueId());
-        if (customer == null) {
-            BasicCustomShops.getInstance().getLogger().info("Customer is null!");
-            return;
-        }
+        if (customer == null) return;
 
         SubShop subShop = customer.getOpenedSubShop();
-        if (subShop == null) {
-            BasicCustomShops.getInstance().getLogger().info("subshop is null!");
-            return;
-        }
+        if (subShop == null) return;
 
         String title = Messages.convertCodes(subShop.getName() + " &7(" + customer.getPage() + ")");
-        if (!player.getOpenInventory().getTitle().equals(title)) {
-            player.closeInventory();
-            return;
-        }
+        if (!player.getOpenInventory().getTitle().equals(title)) { player.closeInventory(); return; }
+        event.setCancelled(true);
 
         int backPageSlot = 45;
         int nextPageSlot = 53;
