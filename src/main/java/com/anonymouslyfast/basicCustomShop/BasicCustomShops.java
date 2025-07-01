@@ -2,9 +2,14 @@ package com.anonymouslyfast.basicCustomShop;
 
 import com.anonymouslyfast.basicCustomShop.commands.ShopCommand;
 import com.anonymouslyfast.basicCustomShop.commands.ShopManagerCommand;
+import com.anonymouslyfast.basicCustomShop.hooks.VaultHook;
 import com.anonymouslyfast.basicCustomShop.listeners.InventoryCloseListener;
 import com.anonymouslyfast.basicCustomShop.listeners.QuitListener;
 import com.anonymouslyfast.basicCustomShop.listeners.ShopClickListener;
+import com.anonymouslyfast.basicCustomShop.listeners.SubShopClickListener;
+import com.anonymouslyfast.basicCustomShop.shop.ProductCreation;
+import com.anonymouslyfast.basicCustomShop.shop.ProductTransactionHandler;
+import com.anonymouslyfast.basicCustomShop.shop.SubShopCreation;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import org.bukkit.plugin.PluginManager;
@@ -54,6 +59,18 @@ public final class BasicCustomShops extends JavaPlugin {
 
         shopIsEnabled = getConfig().getBoolean("shop-enabled");
 
+        // Vault Setup
+        VaultHook.init();
+        if (VaultHook.failedSetup) { // Checking if it failed
+            getLogger().severe("Vault is either not on your server, or you don't have a vault economy plugin like Essentials to set up economy!");
+            PluginManager pm = getServer().getPluginManager();
+            pm.disablePlugin(this);
+            return;
+        }
+
+
+
+
         if (CommandAPI.isLoaded()) {
             CommandAPI.onEnable();
             registerCommands();
@@ -75,6 +92,8 @@ public final class BasicCustomShops extends JavaPlugin {
         pm.registerEvents(new ShopClickListener(), this);
         pm.registerEvents(new QuitListener(), this);
         pm.registerEvents(new ProductCreation(), this);
+        pm.registerEvents(new SubShopClickListener(), this);
+        pm.registerEvents(new ProductTransactionHandler(), this);
     }
 
 

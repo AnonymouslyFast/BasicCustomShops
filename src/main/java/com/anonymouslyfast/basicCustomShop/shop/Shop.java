@@ -1,5 +1,6 @@
-package com.anonymouslyfast.basicCustomShop;
+package com.anonymouslyfast.basicCustomShop.shop;
 
+import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -44,9 +45,11 @@ public class Shop {
     private final static int endOfContainer = 44;
     private final static int startOfContainer = 10;
 
-    public static Inventory getSubShopInventory(SubShop subShop, int page) {
+    public static Inventory getSubShopInventory(Player player, SubShop subShop, int page) {
         String title = subShop.getName() + " &7(" + page + ")";
         Inventory inventory = Bukkit.createInventory(null, 54, Messages.convertCodes(title));
+        Customer customer = currentCustomers.get(player.getUniqueId());
+        customer.setOpenedSubShop(subShop);
         fillInventory(inventory);
         if (!subShop.getProducts().isEmpty()) {
             int currentSlot = startOfContainer;
@@ -69,12 +72,11 @@ public class Shop {
                     meta.setLore(lore);
                     item.setItemMeta(meta);
                     inventory.setItem(currentSlot, item);
+                    customer.addProductSlot(currentSlot, product);
                 }
                 index++;
                 currentSlot++;
             }
-        } else {
-            BasicCustomShops.getInstance().getLogger().info("Empty");
         }
 
         // Close
@@ -123,6 +125,7 @@ public class Shop {
         if (title == null || title.isEmpty()) {title = "&a&lShop";}
         Inventory inventory = Bukkit.createInventory(null, 54, Messages.convertCodes(title));
         fillInventory(inventory);
+        Shop.getCustomer(player.getUniqueId()).clearSubShopSlots();
         if (!subShops.isEmpty()) {
             int passedLoops = 0;
             int startIndex = subShops.size()*(page-1);
@@ -131,7 +134,7 @@ public class Shop {
                     SubShop subShop = subShops.get(i);
                     ItemStack itemStack = new ItemStack(subShop.getIcon());
                     ItemMeta meta = itemStack.getItemMeta();
-                    meta.setDisplayName(Messages.convertCodes("&f" + subShop.getName()));
+                    meta.setDisplayName(Messages.convertCodes(subShop.getName()));
                     meta.setLore(List.of(Messages.convertCodes("&7Click to open this subshop.")));
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                     itemStack.setItemMeta(meta);
@@ -184,6 +187,8 @@ public class Shop {
         Customer customer = Shop.getCustomer(player.getUniqueId());
         if (customer == null) return inventory;
         customer.setPage(page);
+        customer.setOpenedSubShop(null);
+        customer.clearProductSlots();
 
         return inventory;
     }

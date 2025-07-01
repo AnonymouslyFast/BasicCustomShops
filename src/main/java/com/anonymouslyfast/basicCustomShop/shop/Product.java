@@ -1,9 +1,6 @@
-package com.anonymouslyfast.basicCustomShop;
+package com.anonymouslyfast.basicCustomShop.shop;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nullable;
 
 public class Product {
 

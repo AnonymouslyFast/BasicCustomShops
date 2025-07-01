@@ -1,7 +1,7 @@
 package com.anonymouslyfast.basicCustomShop.listeners;
 
-import com.anonymouslyfast.basicCustomShop.Customer;
-import com.anonymouslyfast.basicCustomShop.Shop;
+import com.anonymouslyfast.basicCustomShop.shop.Customer;
+import com.anonymouslyfast.basicCustomShop.shop.Shop;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;

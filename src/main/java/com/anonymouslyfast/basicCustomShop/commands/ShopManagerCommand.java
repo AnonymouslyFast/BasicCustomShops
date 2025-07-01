@@ -1,15 +1,14 @@
 package com.anonymouslyfast.basicCustomShop.commands;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
-import com.anonymouslyfast.basicCustomShop.ProductCreation;
-import com.anonymouslyfast.basicCustomShop.Shop;
-import com.anonymouslyfast.basicCustomShop.SubShopCreation;
+import com.anonymouslyfast.basicCustomShop.shop.ProductCreation;
+import com.anonymouslyfast.basicCustomShop.shop.Shop;
+import com.anonymouslyfast.basicCustomShop.shop.SubShopCreation;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import dev.jorel.commandapi.annotations.Command;
 import dev.jorel.commandapi.annotations.Default;
 import dev.jorel.commandapi.annotations.Permission;
 import dev.jorel.commandapi.annotations.Subcommand;
-import dev.jorel.commandapi.annotations.arguments.ADoubleArgument;
 import dev.jorel.commandapi.annotations.arguments.AStringArgument;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

@@ -1,8 +1,9 @@
-package com.anonymouslyfast.basicCustomShop;
+package com.anonymouslyfast.basicCustomShop.shop;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
@@ -13,9 +14,13 @@ public class Customer {
     private Inventory inventory;
     private Inventory previousInventory;
 
+
     private Integer page;
 
+    private SubShop openedSubShop;
+
     private final HashMap<Integer, String> subShopSlots = new HashMap<>();
+    private final HashMap<Integer, Product> productSlots = new HashMap<>();
 
 
     public Customer(UUID playerUUID) {
@@ -64,4 +69,25 @@ public class Customer {
     public void setPage(Integer page) {
         this.page = page;
     }
+
+    public SubShop getOpenedSubShop() {
+        return openedSubShop;
+    }
+
+    public void setOpenedSubShop(@Nullable SubShop openedSubShop) {
+        this.openedSubShop = openedSubShop;
+    }
+
+    public HashMap<Integer, Product> getProductSlots() {
+        return productSlots;
+    }
+
+    public void addProductSlot(Integer slot, Product product) {
+        productSlots.put(slot, product);
+    }
+
+    public void clearProductSlots() {
+        productSlots.clear();
+    }
+
 }

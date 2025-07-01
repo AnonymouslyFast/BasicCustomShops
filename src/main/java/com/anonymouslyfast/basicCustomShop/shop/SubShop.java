@@ -1,4 +1,4 @@
-package com.anonymouslyfast.basicCustomShop;
+package com.anonymouslyfast.basicCustomShop.shop;
 
 import org.bukkit.Material;
 

@@ -7,3 +7,4 @@ load: STARTUP
 authors: [ AnonymouslyFast ]
 description: Basic shops for your server!
 website: https://anonymouslyfast.com/
+SoftDepend: [Vault]

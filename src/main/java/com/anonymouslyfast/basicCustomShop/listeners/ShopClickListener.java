@@ -1,9 +1,9 @@
 package com.anonymouslyfast.basicCustomShop.listeners;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
-import com.anonymouslyfast.basicCustomShop.Customer;
-import com.anonymouslyfast.basicCustomShop.Shop;
-import com.anonymouslyfast.basicCustomShop.SubShop;
+import com.anonymouslyfast.basicCustomShop.shop.Customer;
+import com.anonymouslyfast.basicCustomShop.shop.Shop;
+import com.anonymouslyfast.basicCustomShop.shop.SubShop;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -43,7 +43,7 @@ public class ShopClickListener implements Listener {
 
         SubShop clickedSubShop = customer.getSubShopFromSlot(event.getSlot());
         if (clickedSubShop == null) return;
-        customer.switchInventory(Shop.getSubShopInventory(clickedSubShop, 1)); // Clicked on subshop
+        customer.switchInventory(Shop.getSubShopInventory(player, clickedSubShop, 1)); // Clicked on subshop
 
     }
 

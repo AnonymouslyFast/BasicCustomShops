@@ -1,4 +1,4 @@
-package com.anonymouslyfast.basicCustomShop;
+package com.anonymouslyfast.basicCustomShop.shop;
 
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.entity.Player;
@@ -20,6 +20,7 @@ public class SubShopCreation implements Listener {
         player.sendMessage(Messages.getMessage("&fPlease &7right click &fwith a item to set as a icon for the subshop. &7(Only takes the material of the item.)"));
         player.sendMessage(Messages.getMessage("&fIn chat say &7`cancel` &for &7`exit` &fto exit from this creator."));
     }
+
 
 
     @EventHandler

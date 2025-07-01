@@ -1,8 +1,8 @@
 package com.anonymouslyfast.basicCustomShop.commands;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
-import com.anonymouslyfast.basicCustomShop.Customer;
-import com.anonymouslyfast.basicCustomShop.Shop;
+import com.anonymouslyfast.basicCustomShop.shop.Customer;
+import com.anonymouslyfast.basicCustomShop.shop.Shop;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import dev.jorel.commandapi.annotations.Command;
 import dev.jorel.commandapi.annotations.Default;
@@ -22,12 +22,15 @@ public class ShopCommand {
             return;
         }
         // Checking if console
-        if (sender instanceof ConsoleCommandSender) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(Messages.getMessage("&cOnly players can use this command!"));
             return;
         }
-        Player player = (Player) sender;
-        Customer customer = new Customer(player.getUniqueId());
+
+        Customer customer;
+        if (Shop.getCustomer(player.getUniqueId()) != null) customer = Shop.getCustomer(player.getUniqueId());
+        else customer = new Customer(player.getUniqueId());
+
         Shop.addCustomer(customer);
         Inventory inventory = Shop.getShopInventory(player);
         customer.switchInventory(inventory);
