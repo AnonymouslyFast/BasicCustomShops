@@ -102,5 +102,47 @@ public class DataManager {
         BasicCustomShops.getInstance().getLogger().info("Loaded " + Shop.getSubShops().size() + " subshops from database.");
     }
 
+    public static void removeSubShop(SubShop subShop) {
+        try {
+            // Deleting the subshop
+            PreparedStatement preparedStatement =  SQLiteHook.getConnection().prepareStatement(
+                    "DELETE FROM subshops WHERE uuid = ?"
+            );
+            preparedStatement.setString(1, subShop.getUuid().toString());
+            preparedStatement.execute();
+            preparedStatement.close();
+
+            // Deleting the products
+            preparedStatement =  SQLiteHook.getConnection().prepareStatement(
+                    "DELETE FROM products WHERE subshop_uuid = ?"
+            );
+            preparedStatement.setString(1, subShop.getUuid().toString());
+            preparedStatement.execute();
+            preparedStatement.close();
+        } catch (SQLException exception) {
+            BasicCustomShops.getInstance().getLogger().log(Level.WARNING,
+                    "Failed to delete subshop:" + subShop.getName() + ".",
+                    exception
+            );
+        }
+    }
+
+    public static void removeProduct(Product product) {
+        try {
+            PreparedStatement preparedStatement =  SQLiteHook.getConnection().prepareStatement(
+                    "DELETE FROM products WHERE uuid = ?"
+            );
+            preparedStatement.setString(1, product.getUuid().toString());
+            preparedStatement.execute();
+            preparedStatement.close();
+        } catch (SQLException exception) {
+            BasicCustomShops.getInstance().getLogger().log(Level.WARNING,
+                    "Failed to delete product:" + product.getMaterial() + ".",
+                    exception
+            );
+        }
+
+    }
+
 
 }

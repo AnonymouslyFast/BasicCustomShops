@@ -112,9 +112,9 @@ public final class BasicCustomShops extends JavaPlugin {
     @Override
     public void onDisable() {
         if (CommandAPI.isLoaded()) {
-            CommandAPI.getRegisteredCommands().forEach(command -> {
-               CommandAPI.unregister(command.commandName());
-            });
+            CommandAPI.getRegisteredCommands().forEach(command ->
+                    CommandAPI.unregister(command.commandName())
+            );
             getLogger().info("Unloaded registered commands. Disabling CommandAPI...");
             CommandAPI.onDisable();
         }

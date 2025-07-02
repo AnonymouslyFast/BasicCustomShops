@@ -1,6 +1,7 @@
 package com.anonymouslyfast.basicCustomShop.shop;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
+import com.anonymouslyfast.basicCustomShop.data.DataManager;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -67,7 +68,9 @@ public class Shop {
                         lore.add(Messages.convertCodes("&8&l&m-----------------"));
                         lore.add(Messages.convertCodes("&7Left Click &fto buy."));
                         lore.add(Messages.convertCodes("&7SHIFT + Left Click &fto buy multiple."));
-                        if (product.getSellPrice() != null) lore.add(Messages.convertCodes("&7Right click &fto sell."));
+                        if (product.getSellPrice() != null || product.getSellPrice() != 0)
+                            lore.add(Messages.convertCodes("&7Right click &fto sell."));
+                        if (player.hasPermission("BCS.shopmanager")) lore.add(Messages.convertCodes("&cShift + Right click to &ldelete&c."));
                         meta.setLore(lore);
                         item.setItemMeta(meta);
                     }
@@ -138,6 +141,8 @@ public class Shop {
                     ItemMeta meta = itemStack.getItemMeta();
                     meta.setDisplayName(Messages.convertCodes(subShop.getName()));
                     meta.setLore(List.of(Messages.convertCodes("&7Click to open this subshop.")));
+                    if (player.hasPermission("BCS.shopmanager")) meta.getLore().add(Messages.convertCodes("&cShift + Right click to &ldelete&c."));
+
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                     itemStack.setItemMeta(meta);
                     inventory.setItem(subShopSlots.get(passedLoops), itemStack);
@@ -201,7 +206,10 @@ public class Shop {
     }
 
     public static void removeSubShop(String name) {
-        subShops.remove(getSubShopFromName(name));
+        SubShop subShop = getSubShopFromName(name);
+        DataManager.removeSubShop(subShop);
+        subShops.remove(subShop);
+        subShopNames.remove(name);
     }
 
     public static boolean isSubshopNameTaken(String name) {
@@ -220,6 +228,9 @@ public class Shop {
 
     public static void setSubShops(List<SubShop> subShops) {
         Shop.subShops = subShops;
+        for (SubShop subShop : subShops) {
+            subShopNames.put(subShop.getName(), subShop);
+        }
     }
 
 

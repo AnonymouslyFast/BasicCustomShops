@@ -62,7 +62,7 @@ public class ProductCreation implements Listener {
             if (stages.get(player) == 2) { // Setting Buy price
                 String message = e.getMessage();
                 try {
-                    Double parsedMessage = Double.parseDouble(message);
+                    double parsedMessage = Double.parseDouble(message);
                     if (parsedMessage <= 0) {
                         player.sendMessage(Messages.getMessage("&cPlease enter a number that's greater than 0."));
                         return;
@@ -83,8 +83,8 @@ public class ProductCreation implements Listener {
                 } else {
                     String message = e.getMessage();
                     try {
-                        Double parsedMessage = Double.parseDouble(message);
-                        if (parsedMessage == null || parsedMessage <= 0) {
+                        double parsedMessage = Double.parseDouble(message);
+                        if (parsedMessage <= 0) {
                             player.sendMessage(Messages.getMessage("&cPlease enter a number that's greater than 0."));
                             return;
                         }

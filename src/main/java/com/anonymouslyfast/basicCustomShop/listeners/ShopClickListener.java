@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 
@@ -43,6 +44,13 @@ public class ShopClickListener implements Listener {
 
         SubShop clickedSubShop = customer.getSubShopFromSlot(event.getSlot());
         if (clickedSubShop == null) return;
+        // Deleting subshop
+        if (event.getClick() == ClickType.SHIFT_RIGHT && player.hasPermission("BCS.shopmanager")) {
+            Shop.removeSubShop(clickedSubShop.getName());
+            player.sendMessage(Messages.convertCodes("&fDeleted 77" + clickedSubShop.getName() + "&f."));
+            customer.switchInventory(Shop.getShopInventory(player, customer.getPage()));
+            return;
+        }
         customer.switchInventory(Shop.getSubShopInventory(player, clickedSubShop, 1)); // Clicked on subshop
 
     }

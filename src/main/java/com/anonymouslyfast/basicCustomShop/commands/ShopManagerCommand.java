@@ -28,7 +28,8 @@ public class ShopManagerCommand {
                   &8- &f/shopmanager reloaddatabase &7- saves all subshops and products to database\s
                   &8- &f/shopmanager toggleshop &7- Enables/Disables the shop\s
                   &8- &f/shopmanager createsubshop [SubShopName] &7- Starts the subshop creation process.\s
-                  &8- &f/shopmanager createproduct [SubShopName] &7- Starts the product creation process.""";
+                  &8- &f/shopmanager createproduct [SubShopName] &7- Starts the product creation process.\s
+                  &8- &f/shopmanager deletesubshop [SubShopName] &7- Deletes the subshop and the products from shop. To delete a product, go to the subshop gui and shift + right click the product.""";
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', helpMessage));
     }
 
@@ -90,6 +91,16 @@ public class ShopManagerCommand {
         }
         Player player = (Player) sender;
         ProductCreation.addPlayer(player, SubShopName);
+    }
+
+    @Subcommand("deletesubshop")
+    public static void deleteSubShop(CommandSender sender, @AStringArgument String SubShopName) {
+        if (!Shop.isSubshopNameTaken(SubShopName)) {
+            sender.sendMessage(Messages.getMessage("&cThis name is not a name of a subshop!"));
+            return;
+        }
+        Shop.removeSubShop(SubShopName);
+        sender.sendMessage(Messages.getMessage("&fDeleted &c" + SubShopName + "&f."));
     }
 
 

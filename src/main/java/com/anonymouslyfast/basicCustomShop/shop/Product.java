@@ -1,7 +1,6 @@
 package com.anonymouslyfast.basicCustomShop.shop;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
@@ -11,7 +10,7 @@ public class Product {
     private double price;
     private Double sellPrice;
 
-    private UUID uuid;
+    private final UUID uuid;
 
     public Product(Material material, double price, Double sellPrice, UUID uuid) {
         this.sellPrice = sellPrice;

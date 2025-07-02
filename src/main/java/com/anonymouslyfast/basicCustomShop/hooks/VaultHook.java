@@ -4,7 +4,6 @@ import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class VaultHook {
@@ -28,9 +27,6 @@ public class VaultHook {
         failedSetup = false;
     }
 
-    public static boolean isEconomyEnabled() {
-        return economy.isEnabled();
-    }
 
     public static Double getBalance(OfflinePlayer offlinePlayer) {
         return economy.getBalance(offlinePlayer);

@@ -1,5 +1,6 @@
 package com.anonymouslyfast.basicCustomShop.shop;
 
+import com.anonymouslyfast.basicCustomShop.data.DataManager;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -33,10 +34,9 @@ public class SubShop {
     public List<Product> getProducts() {return products;}
     public void setProducts(List<Product> products) {this.products = products;}
     public void addProduct(Product product) {this.products.add(product);}
-    public void removeProduct(Product product) {this.products.remove(product);}
-
-
-
-
+    public void removeProduct(Product product) {
+        this.products.remove(product);
+        DataManager.removeProduct(product);
+    }
 
 }

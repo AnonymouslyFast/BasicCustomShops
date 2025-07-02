@@ -1,6 +1,5 @@
 package com.anonymouslyfast.basicCustomShop.listeners;
 
-import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.shop.*;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.Material;
@@ -57,6 +56,11 @@ public class SubShopClickListener implements Listener {
         } else if (event.getClick() == ClickType.RIGHT) {
             ProductTransactionHandler.addPlayer(player, ProductTransactionHandler.TransactionType.SELLING, product);
             player.closeInventory();
+        // ADMIN: deleting product
+        } else if (event.getClick() == ClickType.SHIFT_RIGHT && player.hasPermission("BCS.shopmanager")) {
+            subShop.removeProduct(product);
+            player.sendMessage(Messages.convertCodes("&fDeleted &7" + product.getMaterial().name() + "&f from &7" + subShop.getName() + "&f."));
+            customer.switchInventory(Shop.getSubShopInventory(player, subShop, customer.getPage()));
         }
     }
 }

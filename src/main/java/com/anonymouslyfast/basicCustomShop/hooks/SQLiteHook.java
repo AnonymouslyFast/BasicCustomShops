@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
 
 public class SQLiteHook {
 
@@ -45,9 +46,8 @@ public class SQLiteHook {
             statement.executeUpdate(productsQuery);
             statement.closeOnCompletion();
         } catch (SQLException e) {
-            basicCustomShops.getLogger().severe("FAILED INITIALIZING DATABASE");
             failedSetup = true;
-            e.printStackTrace();
+            basicCustomShops.getLogger().log(Level.SEVERE, "FAILED INITIALIZING DATABASE", e);
         }
     }
 

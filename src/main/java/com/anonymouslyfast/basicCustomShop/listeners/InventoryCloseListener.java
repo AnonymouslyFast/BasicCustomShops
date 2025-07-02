@@ -18,7 +18,6 @@ public class InventoryCloseListener implements Listener {
         if (customer == null) return;
         if (customer.isSwitchingInventory()) {customer.setSwitchingInventory(false); return;}
         if (ProductTransactionHandler.containsPlayer(player.getUniqueId())) return;
-        BasicCustomShops.getInstance().getLogger().info("removed on closed!");
         Shop.removeCustomer(customer);
     }
 
