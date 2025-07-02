@@ -1,6 +1,8 @@
 # Welcome to BasicCustomShops
 Hello! This is a project that I made for practive, this isn't really meant to be useful in anyway, but you're free to use it at your own risk of bugs. 
 
+<b>This plugin depends on the plugin Vault, you will also need a plugin to setup Economy on vault like the plugin Essentials since this plugin just uses the Economy.</b>
+
 ## Commands
 
 This plugin is mainly configured by commands to do stuff like reloading, and creating subshops and products. To access the shopmanager you would have to have the permission `BCS.shopmanager` or be oped.
