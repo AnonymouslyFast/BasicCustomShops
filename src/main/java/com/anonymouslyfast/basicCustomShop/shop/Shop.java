@@ -2,6 +2,7 @@ package com.anonymouslyfast.basicCustomShop.shop;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.data.DataManager;
+import com.anonymouslyfast.basicCustomShop.hooks.VaultHook;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -116,7 +117,7 @@ public class Shop {
         meta = itemStack.getItemMeta();
         assert meta != null;
         meta.setDisplayName(Messages.convertCodes("&a&l Your Information"));
-        meta.setLore(List.of(Messages.convertCodes("&7Coming soon")));
+        meta.setLore(List.of(Messages.convertCodes(" &2Balance: &2&l$&a" + VaultHook.getBalance(player))));
         itemStack.setItemMeta(meta);
         inventory.setItem(49, itemStack);
 
@@ -140,9 +141,10 @@ public class Shop {
                     ItemStack itemStack = new ItemStack(subShop.getIcon());
                     ItemMeta meta = itemStack.getItemMeta();
                     meta.setDisplayName(Messages.convertCodes(subShop.getName()));
-                    meta.setLore(List.of(Messages.convertCodes("&7Click to open this subshop.")));
-                    if (player.hasPermission("BCS.shopmanager")) meta.getLore().add(Messages.convertCodes("&cShift + Right click to &ldelete&c."));
-
+                    List<String> lore = new ArrayList<>();
+                    lore.add(Messages.convertCodes("&7Click to open this subshop."));
+                    if (player.hasPermission("BCS.shopmanager")) lore.add(Messages.convertCodes("&cShift + Right click to &ldelete&c."));
+                    meta.setLore(lore);
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                     itemStack.setItemMeta(meta);
                     inventory.setItem(subShopSlots.get(passedLoops), itemStack);
@@ -186,7 +188,7 @@ public class Shop {
         meta = itemStack.getItemMeta();
         assert meta != null;
         meta.setDisplayName(Messages.convertCodes("&a&l Your Information"));
-        meta.setLore(List.of(Messages.convertCodes("&7Coming soon")));
+        meta.setLore(List.of(Messages.convertCodes(" &2Balance: &2&l$&a" + VaultHook.getBalance(player))));
         itemStack.setItemMeta(meta);
         inventory.setItem(49, itemStack);
 

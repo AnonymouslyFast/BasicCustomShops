@@ -16,7 +16,7 @@ public class ShopCommand {
     @Default
     public static void shop(CommandSender sender) {
         // Checking if shop is enabled for normal players.
-        if (!BasicCustomShops.getInstance().shopIsEnabled && !sender.hasPermission("DCS.shopmanager")) {
+        if (!BasicCustomShops.getInstance().shopIsEnabled && !sender.hasPermission("BCS.shopmanager")) {
             sender.sendMessage(Messages.getMessage("&7Shop is Disabled!"));
             return;
         }
