@@ -2,6 +2,8 @@ package com.anonymouslyfast.basicCustomShop;
 
 import com.anonymouslyfast.basicCustomShop.commands.ShopCommand;
 import com.anonymouslyfast.basicCustomShop.commands.ShopManagerCommand;
+import com.anonymouslyfast.basicCustomShop.data.DataManager;
+import com.anonymouslyfast.basicCustomShop.hooks.SQLiteHook;
 import com.anonymouslyfast.basicCustomShop.hooks.VaultHook;
 import com.anonymouslyfast.basicCustomShop.listeners.InventoryCloseListener;
 import com.anonymouslyfast.basicCustomShop.listeners.QuitListener;
@@ -59,6 +61,15 @@ public final class BasicCustomShops extends JavaPlugin {
 
         shopIsEnabled = getConfig().getBoolean("shop-enabled");
 
+        // Database Setup
+        SQLiteHook.Init();
+        if (SQLiteHook.failedSetup()) { // Checking if it failed
+            getLogger().severe("Something went wrong initializing SQLite hook!");
+            PluginManager pm = getServer().getPluginManager();
+            pm.disablePlugin(this);
+            return;
+        }
+
         // Vault Setup
         VaultHook.init();
         if (VaultHook.failedSetup) { // Checking if it failed
@@ -68,14 +79,15 @@ public final class BasicCustomShops extends JavaPlugin {
             return;
         }
 
-
-
-
+        // Main plugin enabling/registering stuff
         if (CommandAPI.isLoaded()) {
             CommandAPI.onEnable();
             registerCommands();
             registerListeners();
+            // Loading Subshops and Products from database
+            DataManager.loadSubShops();
         }
+
 
     }
 
@@ -106,6 +118,8 @@ public final class BasicCustomShops extends JavaPlugin {
             getLogger().info("Unloaded registered commands. Disabling CommandAPI...");
             CommandAPI.onDisable();
         }
+        // Saving SubShops and Products to Database
+        DataManager.saveSubShops();
     }
 
 

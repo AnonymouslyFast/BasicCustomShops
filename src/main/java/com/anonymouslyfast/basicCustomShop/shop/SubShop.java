@@ -14,6 +14,12 @@ public class SubShop {
 
     private List<Product> products = new ArrayList<>();
 
+    public SubShop(String name, Material icon, UUID uuid) {
+        this.name = name;
+        this.icon = icon;
+        this.uuid = uuid;
+    }
+
     public SubShop(String name, Material icon) {
         this.name = name;
         this.icon = icon;

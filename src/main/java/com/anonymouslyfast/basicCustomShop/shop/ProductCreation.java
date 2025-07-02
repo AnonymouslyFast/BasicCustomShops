@@ -37,12 +37,12 @@ public class ProductCreation implements Listener {
                 return;
             }
             ItemStack item = e.getItem();
-            Product product = new Product(item);
+            Product product = new Product(item.getType());
             currentProducts.put(player, product);
             stages.remove(player);
             stages.put(player, 2);
             player.sendMessage(Messages.getMessage(" "));
-            player.sendMessage(Messages.getMessage("&fYour current product is &a" + product.getItem().getType() +
+            player.sendMessage(Messages.getMessage("&fYour current product is &a" + product.getMaterial() +
                     "&f. Please send a number to set as the buy price &7(You can send 0 for it to be free.)"));
             player.sendMessage(Messages.getMessage("&fSend &7`cancel` &for &7`exit` &fto exit out of this product creator."));
         }
@@ -103,7 +103,7 @@ public class ProductCreation implements Listener {
         Product product = currentProducts.get(player);
 
         player.sendMessage(Messages.getMessage("&aCreated a new product for subshop &f" + currentPlayers.get(player)
-        + "\n&a" +  product.getItem().getType() + "\n  &7Buy: " + product.getPrice() + "\n  &7Sell: " + product.getSellPrice()
+        + "\n&a" +  product.getMaterial() + "\n  &7Buy: " + product.getPrice() + "\n  &7Sell: " + product.getSellPrice()
         ));
 
         Shop.getSubShopFromName(currentPlayers.get(player)).addProduct(product);

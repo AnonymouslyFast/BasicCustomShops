@@ -1,6 +1,7 @@
 package com.anonymouslyfast.basicCustomShop.commands;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
+import com.anonymouslyfast.basicCustomShop.data.DataManager;
 import com.anonymouslyfast.basicCustomShop.shop.ProductCreation;
 import com.anonymouslyfast.basicCustomShop.shop.Shop;
 import com.anonymouslyfast.basicCustomShop.shop.SubShopCreation;
@@ -24,6 +25,7 @@ public class ShopManagerCommand {
                 &8=== &a&lShop &2&lManager &8===\s
                   &8- &f/shopmanager help &7- Shows this message.\s
                   &8- &f/shopmanager reload &7- Reloads config\s
+                  &8- &f/shopmanager reloaddatabase &7- saves all subshops and products to database\s
                   &8- &f/shopmanager toggleshop &7- Enables/Disables the shop\s
                   &8- &f/shopmanager createsubshop [SubShopName] &7- Starts the subshop creation process.\s
                   &8- &f/shopmanager createproduct [SubShopName] &7- Starts the product creation process.""";
@@ -43,6 +45,12 @@ public class ShopManagerCommand {
     public static void reload(CommandSender sender) {
         BasicCustomShops.getInstance().customReloadConfig();
         sender.sendMessage(Messages.getMessage("&fReloaded Config!"));
+    }
+
+    @Subcommand("reloaddatabase")
+    public static void reloadDatabase(CommandSender sender) {
+        DataManager.saveSubShops();
+        sender.sendMessage(Messages.getMessage("&fSaved all subshops and products to database!"));
     }
 
     @Subcommand("toggleshop")

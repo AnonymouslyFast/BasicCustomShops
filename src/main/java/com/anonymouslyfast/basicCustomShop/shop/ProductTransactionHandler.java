@@ -36,12 +36,12 @@ public class ProductTransactionHandler implements Listener {
         if (type == TransactionType.BUYING) {
             currentBuyingPlayers.put(player.getUniqueId(), product);
             player.sendMessage(Messages.getMessage("&fPlease send the number of &7" +
-                    product.getItem().getItemMeta().getDisplayName() + " &fyou would like to buy." +
+                    product.getMaterial().name() + " &fyou would like to buy." +
                     " If you would like to exit, please type &7`exit` &for &7`cancel` &finstead."));
         } else if (type == TransactionType.SELLING) {
             currentSellingPlayers.put(player.getUniqueId(), product);
             player.sendMessage(Messages.getMessage("&fPlease send the number of &7" +
-                    product.getItem().getItemMeta().getDisplayName() + " &fyou would like to sell." +
+                    product.getMaterial().name() + " &fyou would like to sell." +
                     " If you would like to exit, please type &7`exit` &for &7`cancel` &finstead."));
         }
     }
@@ -61,8 +61,7 @@ public class ProductTransactionHandler implements Listener {
             return;
         }
 
-        ItemStack itemStack = product.getItem();
-        itemStack.setAmount(amount);
+        ItemStack itemStack = new ItemStack(product.getMaterial(), amount);
 
         EconomyResponse economyResponse = VaultHook.withdrawPlayer(player, price);
         if (!economyResponse.transactionSuccess()) {
@@ -91,8 +90,7 @@ public class ProductTransactionHandler implements Listener {
 
         double price = product.getSellPrice()*amount;
 
-        ItemStack itemStack = product.getItem();
-        itemStack.setAmount(amount);
+        ItemStack itemStack = new ItemStack(product.getMaterial(), amount);
 
         if (!player.getInventory().contains(itemStack)) {
             player.sendMessage(Messages.getMessage("&cYou don't have the items to sell this much!"));

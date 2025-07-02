@@ -58,7 +58,7 @@ public class Shop {
                     if ((currentSlot + 1) % 9 == 0) currentSlot += 2;
                     if (currentSlot >= endOfContainer) break;
 
-                    ItemStack item =  product.getItem();
+                    ItemStack item = new ItemStack(product.getMaterial());
                     ItemMeta meta = item.getItemMeta();
                     if (meta != null) {
                         List<String> lore = new ArrayList<>();
