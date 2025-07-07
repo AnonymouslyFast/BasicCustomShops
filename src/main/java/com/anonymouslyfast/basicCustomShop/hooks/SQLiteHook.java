@@ -11,17 +11,15 @@ import java.util.logging.Level;
 
 public class SQLiteHook {
 
-    private final static BasicCustomShops basicCustomShops = BasicCustomShops.getInstance();
+    private boolean failedSetup;
 
-    private static boolean failedSetup;
-
-    private static Connection connection;
+    private Connection connection;
 
     // Getting/Creating Database, Connection, and Tables
-    public static void Init() {
-        basicCustomShops.getLogger().info("Initializing SQLite");
+    public void init(BasicCustomShops plugin) {
+        plugin.getLogger().info("Initializing SQLite");
         try {
-            File dbFile = new File(BasicCustomShops.getInstance().getDataFolder() + "/database.db");
+            File dbFile = new File(BasicCustomShops.plugin.getDataFolder() + "/database.db");
 
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getPath());
             Statement statement = connection.createStatement();
@@ -47,15 +45,15 @@ public class SQLiteHook {
             statement.closeOnCompletion();
         } catch (SQLException e) {
             failedSetup = true;
-            basicCustomShops.getLogger().log(Level.SEVERE, "FAILED INITIALIZING DATABASE", e);
+            plugin.getLogger().log(Level.SEVERE, "FAILED INITIALIZING DATABASE", e);
         }
     }
 
-    public static Connection getConnection() {
+    public Connection getConnection() {
         return connection;
     }
 
-    public static boolean failedSetup() {
+    public boolean failedSetup() {
         return failedSetup;
     }
 

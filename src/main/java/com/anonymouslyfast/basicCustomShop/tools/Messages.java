@@ -10,7 +10,7 @@ public class Messages {
     }
 
     public static String getMessage(String msg) {
-        return convertCodes(BasicCustomShops.getInstance().messagePrefix + " " + msg);
+        return convertCodes(BasicCustomShops.plugin.messagePrefix + " " + msg);
     }
 
 }

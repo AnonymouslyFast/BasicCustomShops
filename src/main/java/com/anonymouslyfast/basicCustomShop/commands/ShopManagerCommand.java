@@ -1,10 +1,6 @@
 package com.anonymouslyfast.basicCustomShop.commands;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
-import com.anonymouslyfast.basicCustomShop.data.DataManager;
-import com.anonymouslyfast.basicCustomShop.shop.ProductCreation;
-import com.anonymouslyfast.basicCustomShop.shop.Shop;
-import com.anonymouslyfast.basicCustomShop.shop.SubShopCreation;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import dev.jorel.commandapi.annotations.Command;
 import dev.jorel.commandapi.annotations.Default;
@@ -44,23 +40,23 @@ public class ShopManagerCommand {
 
     @Subcommand("reload")
     public static void reload(CommandSender sender) {
-        BasicCustomShops.getInstance().customReloadConfig();
+        BasicCustomShops.plugin.customReloadConfig();
         sender.sendMessage(Messages.getMessage("&fReloaded Config!"));
     }
 
     @Subcommand("reloaddatabase")
     public static void reloadDatabase(CommandSender sender) {
-        DataManager.saveSubShops();
+        BasicCustomShops.plugin.shopManager.reloadDataService();
         sender.sendMessage(Messages.getMessage("&fSaved all subshops and products to database!"));
     }
 
     @Subcommand("toggleshop")
     public static void toggleShop(CommandSender sender) {
-        if (BasicCustomShops.getInstance().shopIsEnabled) {
-            BasicCustomShops.getInstance().changeShopBoolean(false);
+        if (BasicCustomShops.plugin.shopIsEnabled) {
+            BasicCustomShops.plugin.changeShopBoolean(false);
             sender.sendMessage(Messages.getMessage("&fToggled shop to &cDisabled&f."));
         } else {
-            BasicCustomShops.getInstance().changeShopBoolean(true);
+            BasicCustomShops.plugin.changeShopBoolean(true);
             sender.sendMessage(Messages.getMessage("&fToggled shop to &aEnabled&f."));
         }
     }

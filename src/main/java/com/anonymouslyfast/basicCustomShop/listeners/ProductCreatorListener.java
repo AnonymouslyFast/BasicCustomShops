@@ -1,5 +1,9 @@
-package com.anonymouslyfast.basicCustomShop.shop;
+package com.anonymouslyfast.basicCustomShop.listeners;
 
+import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
+import com.anonymouslyfast.basicCustomShop.shop.ShopAdmin;
+import com.anonymouslyfast.basicCustomShop.shop.PlayerTracking;
+import com.anonymouslyfast.basicCustomShop.shop.Product;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,25 +15,24 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.UUID;
 
-public class ProductCreation implements Listener {
+public class ProductCreatorListener implements Listener {
 
-    private final static HashMap<Player, String> currentPlayers = new HashMap<>();
-    private final static HashMap<Player, Product> currentProducts = new HashMap<>();
-    private final static HashMap<Player, Integer> stages = new HashMap<>();
+    private final BasicCustomShops plugin = BasicCustomShops.plugin;
 
-    public static void addPlayer(Player player, String subShop) {
-        currentPlayers.put(player, subShop);
-        stages.put(player, 1);
-        player.sendMessage(Messages.getMessage("&fPlease &7right click while holding a item &fthat your would like to sell in this subshop"));
-        player.sendMessage(Messages.getMessage("&fSend &7`cancel` &for &7`exit` &fto exit out of this product creator."));
-    }
+    private final static HashMap<UUID, Integer> stages = new HashMap<>();
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent e) {
+        if (PlayerTracking.getPlayerStatus(e.getPlayer().getUniqueId()) != PlayerTracking.PlayerStatus.CREATINGPRODUCT)
+            return;
+
         Player player = e.getPlayer();
-        if (!currentPlayers.containsKey(player)) return;
-        if (currentProducts.containsKey(player)) return;
+        ShopAdmin shopAdmin = BasicCustomShops.plugin.shopManager.getAdminByUUID(player.getUniqueId());
+        if (shopAdmin == null) return;
+        if (shopAdmin.getProduct() != null) return;
+
         if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             e.setCancelled(true);
             if (e.getItem() == null) {
@@ -38,9 +41,8 @@ public class ProductCreation implements Listener {
             }
             ItemStack item = e.getItem();
             Product product = new Product(item.getType());
-            currentProducts.put(player, product);
-            stages.remove(player);
-            stages.put(player, 2);
+            shopAdmin.setProduct(product);
+            stages.put(player.getUniqueId(), 1);
             player.sendMessage(Messages.getMessage(" "));
             player.sendMessage(Messages.getMessage("&fYour current product is &a" + product.getMaterial() +
                     "&f. Please send a number to set as the buy price &7(You can send 0 for it to be free.)"));
@@ -50,16 +52,21 @@ public class ProductCreation implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
+        if (PlayerTracking.getPlayerStatus(e.getPlayer().getUniqueId()) != PlayerTracking.PlayerStatus.CREATINGPRODUCT)
+            return;
+
         Player player = e.getPlayer();
-        if (!currentPlayers.containsKey(player)) return;
+        ShopAdmin shopAdmin = BasicCustomShops.plugin.shopManager.getAdminByUUID(player.getUniqueId());
+        if (shopAdmin == null) return;
+        if (shopAdmin.getProduct() == null) return;
         e.setCancelled(true);
         if (e.getMessage().equalsIgnoreCase("cancel") || e.getMessage().equalsIgnoreCase("exit")) {
-            currentPlayers.remove(player);
-            currentProducts.remove(player);
-            stages.remove(player);
+            PlayerTracking.removePlayer(player.getUniqueId());
+            stages.remove(player.getUniqueId());
+            plugin.shopManager.removeAdmin(shopAdmin);
             player.sendMessage(Messages.getMessage("&aRemoved you from the product creator."));
         } else {
-            if (stages.get(player) == 2) { // Setting Buy price
+            if (stages.get(player.getUniqueId()) == 1) { // Setting Buy price
                 String message = e.getMessage();
                 try {
                     double parsedMessage = Double.parseDouble(message);
@@ -67,17 +74,17 @@ public class ProductCreation implements Listener {
                         player.sendMessage(Messages.getMessage("&cPlease enter a number that's greater than 0."));
                         return;
                     }
-                    currentProducts.get(player).setPrice(parsedMessage);
+                    shopAdmin.getProduct().setPrice(parsedMessage);
                     player.sendMessage(Messages.getMessage(" "));
-                    player.sendMessage(Messages.getMessage("&fYour current price is &2&l$&a" + currentProducts.get(player).getPrice()
+                    player.sendMessage(Messages.getMessage("&fYour current price is &2&l$&a" + shopAdmin.getProduct().getPrice()
                             + "&f. Please send a sell price, or send &7`complete` &f to complete the creation process."));
                     player.sendMessage(Messages.getMessage("&fSend &7`cancel` &for &7`exit` &fto exit out of this product creator."));
-                    stages.remove(player);
-                    stages.put(player, 3);
+                    stages.remove(player.getUniqueId());
+                    stages.put(player.getUniqueId(), 2);
                 } catch (NumberFormatException ex) {
                     player.sendMessage(Messages.getMessage("&cPlease enter a number to set the buy price of this item, or enter &7`cancel` &c or &7`exit` &cto leave this creator."));
                 }
-            } else if (stages.get(player) == 3) {
+            } else if (stages.get(player.getUniqueId()) == 2) {
                 if (e.getMessage().equalsIgnoreCase("complete")) {
                     complete(player);
                 } else {
@@ -88,7 +95,7 @@ public class ProductCreation implements Listener {
                             player.sendMessage(Messages.getMessage("&cPlease enter a number that's greater than 0."));
                             return;
                         }
-                        currentProducts.get(player).setSellPrice(parsedMessage);
+                        shopAdmin.getProduct().setSellPrice(parsedMessage);
                         complete(player);
                     } catch (NumberFormatException ex) {
                         player.sendMessage(Messages.getMessage("&cPlease enter a number to set the sell price of this item, or enter &7`cancel` &c or &7`exit` &cto leave this creator."));
@@ -100,31 +107,24 @@ public class ProductCreation implements Listener {
     }
 
     private static void complete(Player player) {
-        Product product = currentProducts.get(player);
+        ShopAdmin shopAdmin = BasicCustomShops.plugin.shopManager.getAdminByUUID(player.getUniqueId());
+        Product product = shopAdmin.getProduct();
 
-        player.sendMessage(Messages.getMessage("&aCreated a new product for subshop &f" + currentPlayers.get(player)
-        + "\n&a" +  product.getMaterial() + "\n  &7Buy: " + product.getPrice() + "\n  &7Sell: " + product.getSellPrice()
-        ));
+        player.sendMessage(Messages.getMessage("&aCreated a new product for shop &f" + shopAdmin.getShop().getName())
+                + "\n&a" +  product.getMaterial() + "\n  &7Buy: " + product.getPrice() + "\n  &7Sell: " + product.getSellPrice()
+        );
 
-        Shop.getSubShopFromName(currentPlayers.get(player)).addProduct(product);
+       shopAdmin.getShop().addProduct(product);
 
-        currentPlayers.remove(player);
-        currentProducts.remove(player);
-        stages.remove(player);
+        stages.remove(player.getUniqueId());
+        BasicCustomShops.plugin.shopManager.removeAdmin(shopAdmin);
     }
 
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        if (currentPlayers.containsKey(e.getPlayer())) {
-            currentPlayers.remove(e.getPlayer());
-            currentProducts.remove(e.getPlayer());
-            stages.remove(e.getPlayer());
-        }
+        stages.remove(e.getPlayer().getUniqueId());
     }
-
-
-
 
 
 }

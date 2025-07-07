@@ -2,7 +2,6 @@ package com.anonymouslyfast.basicCustomShop.commands;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.shop.Customer;
-import com.anonymouslyfast.basicCustomShop.shop.Shop;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import dev.jorel.commandapi.annotations.Command;
 import dev.jorel.commandapi.annotations.Default;

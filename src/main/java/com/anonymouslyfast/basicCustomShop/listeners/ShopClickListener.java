@@ -1,59 +1,84 @@
 package com.anonymouslyfast.basicCustomShop.listeners;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
-import com.anonymouslyfast.basicCustomShop.shop.Customer;
-import com.anonymouslyfast.basicCustomShop.shop.Shop;
-import com.anonymouslyfast.basicCustomShop.shop.SubShop;
+import com.anonymouslyfast.basicCustomShop.shop.*;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 
+import java.util.UUID;
 
 public class ShopClickListener implements Listener {
 
-    private final FileConfiguration config = BasicCustomShops.getInstance().getConfig();
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Customer customer = Shop.getCustomer(event.getWhoClicked().getUniqueId());
-        if (customer == null) return;
-        String title = config.getString("shop-title") + " &7(" + customer.getPage() + ")";
-        if (!event.getView().getTitle().equals(Messages.convertCodes(title))) return;
-        event.setCancelled(true);
 
         Player player = (Player) event.getWhoClicked();
+        Customer customer = BasicCustomShops.plugin.shopManager.getCustomerByUUID(player.getUniqueId());
+        if (customer == null) return;
 
-        if (event.getSlot() == 45) { // Previous page / Back to Shop
-            if (event.getClickedInventory().getItem(45).getType() != Material.BARRIER) {
-                customer.switchInventory(Shop.getShopInventory(player, customer.getPage()-1));
-            } else {
-                player.closeInventory();
-                Shop.removeCustomer(customer);
+        Shop shop = customer.getOpenedShop();
+        if (shop == null) return;
+
+        String title = Messages.convertCodes(shop.getName() + " &7(" + customer.getPage() + ")");
+        if (!player.getOpenInventory().getTitle().equals(title)) { player.closeInventory(); return; }
+        event.setCancelled(true);
+
+        int backPageSlot = 45;
+        int nextPageSlot = 53;
+
+
+        if (event.getSlot() == backPageSlot) { // Previous page
+            if (event.getClickedInventory().getItem(backPageSlot).getType() != Material.BARRIER) {
+                String newTitle = BasicCustomShops.plugin.shopManager.getInventoryName(shop, customer.getPage()-1);
+                customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), title)
+                        .buildShopInventory(shop, customer.getPage()-1)
+                );
+            } else { // Back To Shop
+                customer.switchInventory(
+                        BasicCustomShops.plugin.shopManager.getMainInventory(player.getUniqueId(), 1)
+                );
             }
             return;
-        } else if (event.getSlot() == 53) { // Next Page
-            if (event.getClickedInventory().getItem(53).getType() != Material.ARROW) return;
-            customer.switchInventory(Shop.getShopInventory(player, customer.getPage()+1));
+        } else if (event.getSlot() == nextPageSlot) { // Next Page
+            if (event.getClickedInventory().getItem(nextPageSlot).getType() != Material.ARROW) return;
+            String newTitle = BasicCustomShops.plugin.shopManager.getInventoryName(shop, customer.getPage()+1);
+            customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), title)
+                    .buildShopInventory(shop, customer.getPage()+1)
+            );
             return;
         }
 
-        SubShop clickedSubShop = customer.getSubShopFromSlot(event.getSlot());
-        if (clickedSubShop == null) return;
-        // Deleting subshop
-        if (event.getClick() == ClickType.SHIFT_RIGHT && player.hasPermission("BCS.shopmanager")) {
-            Shop.removeSubShop(clickedSubShop.getName());
-            player.sendMessage(Messages.convertCodes("&fDeleted 77" + clickedSubShop.getName() + "&f."));
-            customer.switchInventory(Shop.getShopInventory(player, customer.getPage()));
-            return;
-        }
-        customer.switchInventory(Shop.getSubShopInventory(player, clickedSubShop, 1)); // Clicked on subshop
 
+        Product product = customer.getProductSlots().get(event.getSlot());
+        if (product == null) return;
+
+        // Buying one product
+        if (event.getClick() == ClickType.LEFT) {
+            TransactionHandler.buy(customer, product);
+        // Buying multiple product
+        } else if (event.getClick() == ClickType.SHIFT_LEFT) {
+            PlayerTracking.updatePlayerStatus(UUID.randomUUID(), PlayerTracking.PlayerStatus.BUYINGMULTIPLE);
+            customer.setProductInCart(product);
+            player.closeInventory();
+        // Selling product
+        } else if (event.getClick() == ClickType.RIGHT) {
+            PlayerTracking.updatePlayerStatus(UUID.randomUUID(), PlayerTracking.PlayerStatus.SELLING);
+            customer.setProductInCart(product);
+            player.closeInventory();
+        // ADMIN: deleting product
+        } else if (event.getClick() == ClickType.SHIFT_RIGHT && player.hasPermission("BCS.shopmanager")) {
+            BasicCustomShops.plugin.shopManager.removeProduct(shop, product);
+            player.sendMessage(Messages.convertCodes("&fDeleted &7" + product.getMaterial().name() + "&f from &7" + shop.getName() + "&f."));
+            String newTitle = BasicCustomShops.plugin.shopManager.getInventoryName(shop, customer.getPage());
+            customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), title)
+                    .buildShopInventory(shop, customer.getPage())
+            );
+        }
     }
-
-
 }
