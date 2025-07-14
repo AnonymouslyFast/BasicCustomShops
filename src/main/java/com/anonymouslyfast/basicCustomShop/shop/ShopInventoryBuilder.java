@@ -17,6 +17,8 @@ import java.util.UUID;
 
 public final class ShopInventoryBuilder {
 
+    private final static ShopManager shopManager = BasicCustomShops.getInstance().shopManager;
+
     private final Inventory inventory;
     private final boolean isAdmin;
     private final UUID playerUUID;
@@ -52,7 +54,7 @@ public final class ShopInventoryBuilder {
     public Inventory buildShopInventory(Shop shop, int page) {
         boolean requiresNextPage = (shop.getProducts().size() >= 1+(maxProductsPerPage*page));
         boolean requiresBackPage = page > 1;
-        Customer customer = BasicCustomShops.plugin.shopManager.getCustomerByUUID(playerUUID);
+        Customer customer = shopManager.getCustomerByUUID(playerUUID);
         if (!shop.getProducts().isEmpty()) {
             int currentSlot = startOfContainer;
             int index = 0;
@@ -103,7 +105,7 @@ public final class ShopInventoryBuilder {
         if (!shops.isEmpty()) {
             int passedLoops = 0;
             int startIndex = shops.size()*(page-1);
-            Customer customer = BasicCustomShops.plugin.shopManager.getCustomerByUUID(playerUUID);
+            Customer customer = shopManager.getCustomerByUUID(playerUUID);
             for (int i = 0; i < shops.size(); i++) {
                 if (i >= startIndex && passedLoops < subShopSlots.size()) {
                     Shop shop = shops.get(i);

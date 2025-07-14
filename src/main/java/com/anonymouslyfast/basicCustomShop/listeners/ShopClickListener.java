@@ -9,17 +9,19 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 
 import java.util.UUID;
 
 public class ShopClickListener implements Listener {
 
+    private final ShopManager shopManager = BasicCustomShops.getInstance().shopManager;
+
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
         Player player = (Player) event.getWhoClicked();
-        Customer customer = BasicCustomShops.plugin.shopManager.getCustomerByUUID(player.getUniqueId());
+        Customer customer = shopManager.getCustomerByUUID(player.getUniqueId());
         if (customer == null) return;
 
         Shop shop = customer.getOpenedShop();
@@ -35,20 +37,18 @@ public class ShopClickListener implements Listener {
 
         if (event.getSlot() == backPageSlot) { // Previous page
             if (event.getClickedInventory().getItem(backPageSlot).getType() != Material.BARRIER) {
-                String newTitle = BasicCustomShops.plugin.shopManager.getInventoryName(shop, customer.getPage()-1);
-                customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), title)
+                String newTitle = shopManager.getInventoryName(shop, customer.getPage()-1);
+                customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), newTitle)
                         .buildShopInventory(shop, customer.getPage()-1)
                 );
             } else { // Back To Shop
-                customer.switchInventory(
-                        BasicCustomShops.plugin.shopManager.getMainInventory(player.getUniqueId(), 1)
-                );
+                customer.switchInventory(shopManager.getMainInventory(player.getUniqueId(), 1));
             }
             return;
         } else if (event.getSlot() == nextPageSlot) { // Next Page
             if (event.getClickedInventory().getItem(nextPageSlot).getType() != Material.ARROW) return;
-            String newTitle = BasicCustomShops.plugin.shopManager.getInventoryName(shop, customer.getPage()+1);
-            customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), title)
+            String newTitle = shopManager.getInventoryName(shop, customer.getPage()+1);
+            customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), newTitle)
                     .buildShopInventory(shop, customer.getPage()+1)
             );
             return;
@@ -73,10 +73,10 @@ public class ShopClickListener implements Listener {
             player.closeInventory();
         // ADMIN: deleting product
         } else if (event.getClick() == ClickType.SHIFT_RIGHT && player.hasPermission("BCS.shopmanager")) {
-            BasicCustomShops.plugin.shopManager.removeProduct(shop, product);
+            shopManager.removeProduct(shop, product);
             player.sendMessage(Messages.convertCodes("&fDeleted &7" + product.getMaterial().name() + "&f from &7" + shop.getName() + "&f."));
-            String newTitle = BasicCustomShops.plugin.shopManager.getInventoryName(shop, customer.getPage());
-            customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), title)
+            String newTitle = shopManager.getInventoryName(shop, customer.getPage());
+            customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), newTitle)
                     .buildShopInventory(shop, customer.getPage())
             );
         }

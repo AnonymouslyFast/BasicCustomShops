@@ -13,12 +13,12 @@ public class VaultHook {
     public static boolean failedSetup = false;
 
     public static void init() {
-        if (BasicCustomShops.plugin.getServer().getPluginManager().getPlugin("Vault") == null) {
+        if (BasicCustomShops.getInstance().getServer().getPluginManager().getPlugin("Vault") == null) {
             failedSetup = true;
             return;
         }
         RegisteredServiceProvider<Economy> rsp =
-                BasicCustomShops.plugin.getServer().getServicesManager().getRegistration(Economy.class);
+                BasicCustomShops.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             failedSetup = true;
             return;

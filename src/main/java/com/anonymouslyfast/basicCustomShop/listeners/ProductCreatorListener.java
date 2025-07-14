@@ -4,6 +4,7 @@ import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.shop.ShopAdmin;
 import com.anonymouslyfast.basicCustomShop.shop.PlayerTracking;
 import com.anonymouslyfast.basicCustomShop.shop.Product;
+import com.anonymouslyfast.basicCustomShop.shop.ShopManager;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 public class ProductCreatorListener implements Listener {
 
-    private final BasicCustomShops plugin = BasicCustomShops.plugin;
+    private final ShopManager shopManager = BasicCustomShops.getInstance().shopManager;
 
     private final static HashMap<UUID, Integer> stages = new HashMap<>();
 
@@ -29,7 +30,7 @@ public class ProductCreatorListener implements Listener {
             return;
 
         Player player = e.getPlayer();
-        ShopAdmin shopAdmin = BasicCustomShops.plugin.shopManager.getAdminByUUID(player.getUniqueId());
+        ShopAdmin shopAdmin = shopManager.getAdminByUUID(player.getUniqueId());
         if (shopAdmin == null) return;
         if (shopAdmin.getProduct() != null) return;
 
@@ -56,14 +57,14 @@ public class ProductCreatorListener implements Listener {
             return;
 
         Player player = e.getPlayer();
-        ShopAdmin shopAdmin = BasicCustomShops.plugin.shopManager.getAdminByUUID(player.getUniqueId());
+        ShopAdmin shopAdmin = shopManager.getAdminByUUID(player.getUniqueId());
         if (shopAdmin == null) return;
         if (shopAdmin.getProduct() == null) return;
         e.setCancelled(true);
         if (e.getMessage().equalsIgnoreCase("cancel") || e.getMessage().equalsIgnoreCase("exit")) {
             PlayerTracking.removePlayer(player.getUniqueId());
             stages.remove(player.getUniqueId());
-            plugin.shopManager.removeAdmin(shopAdmin);
+            shopManager.removeAdmin(shopAdmin);
             player.sendMessage(Messages.getMessage("&aRemoved you from the product creator."));
         } else {
             if (stages.get(player.getUniqueId()) == 1) { // Setting Buy price
@@ -106,8 +107,8 @@ public class ProductCreatorListener implements Listener {
         }
     }
 
-    private static void complete(Player player) {
-        ShopAdmin shopAdmin = BasicCustomShops.plugin.shopManager.getAdminByUUID(player.getUniqueId());
+    private void complete(Player player) {
+        ShopAdmin shopAdmin = shopManager.getAdminByUUID(player.getUniqueId());
         Product product = shopAdmin.getProduct();
 
         player.sendMessage(Messages.getMessage("&aCreated a new product for shop &f" + shopAdmin.getShop().getName())
@@ -117,7 +118,7 @@ public class ProductCreatorListener implements Listener {
        shopAdmin.getShop().addProduct(product);
 
         stages.remove(player.getUniqueId());
-        BasicCustomShops.plugin.shopManager.removeAdmin(shopAdmin);
+        shopManager.removeAdmin(shopAdmin);
     }
 
 

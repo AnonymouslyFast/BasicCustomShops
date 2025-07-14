@@ -10,7 +10,11 @@ public final class ShopCreator {
         SHOP
     }
 
-    public final static ShopCreator instance = new ShopCreator();
+    private final static ShopCreator instance = new ShopCreator();
+
+    public static ShopCreator getInstance() {
+        return instance;
+    }
 
     public void addPlayer(Player player, CreatingType creatingType) {
         PlayerTracking.PlayerStatus status = null;

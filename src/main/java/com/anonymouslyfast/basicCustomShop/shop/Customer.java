@@ -6,14 +6,12 @@ import org.bukkit.inventory.Inventory;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.UUID;
 
 public class Customer {
 
     private final UUID playerUUID;
     private Inventory inventory;
-    private Inventory previousInventory;
 
     private Product productInCart;
 
@@ -47,13 +45,12 @@ public class Customer {
 
     public void switchInventory(Inventory inventory) {
         this.inventory = inventory;
-        previousInventory = this.inventory;
         PlayerTracking.updatePlayerStatus(playerUUID, PlayerTracking.PlayerStatus.SWITCHINGINVENTORY);
-        Bukkit.getScheduler().callSyncMethod(BasicCustomShops.plugin, () -> Objects.requireNonNull(Bukkit.getPlayer(playerUUID)).openInventory(inventory));
+        Bukkit.getScheduler().callSyncMethod(BasicCustomShops.getInstance(), () -> Bukkit.getPlayer(playerUUID).openInventory(inventory));
     }
 
     public Shop getShopFromSlot(Integer slot) {
-        return BasicCustomShops.plugin.shopManager.getShopFromName(shopSlots.get(slot));
+        return BasicCustomShops.getInstance().shopManager.getShopFromName(shopSlots.get(slot));
     }
 
     public void addShopSlot(Integer slot, String subShop) {

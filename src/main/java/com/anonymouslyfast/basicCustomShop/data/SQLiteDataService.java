@@ -4,7 +4,6 @@ import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.hooks.SQLiteHook;
 import com.anonymouslyfast.basicCustomShop.shop.Product;
 import com.anonymouslyfast.basicCustomShop.shop.Shop;
-import com.anonymouslyfast.basicCustomShop.shop.ShopManager;
 import org.bukkit.Material;
 import org.bukkit.plugin.PluginManager;
 

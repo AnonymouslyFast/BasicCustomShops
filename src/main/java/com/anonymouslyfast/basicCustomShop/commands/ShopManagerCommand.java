@@ -1,6 +1,10 @@
 package com.anonymouslyfast.basicCustomShop.commands;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
+import com.anonymouslyfast.basicCustomShop.shop.PlayerTracking;
+import com.anonymouslyfast.basicCustomShop.shop.Shop;
+import com.anonymouslyfast.basicCustomShop.shop.ShopAdmin;
+import com.anonymouslyfast.basicCustomShop.shop.ShopCreator;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import dev.jorel.commandapi.annotations.Command;
 import dev.jorel.commandapi.annotations.Default;
@@ -20,12 +24,10 @@ public class ShopManagerCommand {
         String helpMessage = """
                 &8=== &a&lShop &2&lManager &8===\s
                   &8- &f/shopmanager help &7- Shows this message.\s
-                  &8- &f/shopmanager reload &7- Reloads config\s
-                  &8- &f/shopmanager reloaddatabase &7- saves all subshops and products to database\s
-                  &8- &f/shopmanager toggleshop &7- Enables/Disables the shop\s
-                  &8- &f/shopmanager createsubshop [SubShopName] &7- Starts the subshop creation process.\s
-                  &8- &f/shopmanager createproduct [SubShopName] &7- Starts the product creation process.\s
-                  &8- &f/shopmanager deletesubshop [SubShopName] &7- Deletes the subshop and the products from shop. To delete a product, go to the subshop gui and shift + right click the product.""";
+                  &8- &f/shopmanager saveshops &7- saves all shops and products to database\s
+                  &8- &f/shopmanager createshop [ShopName] &7- Starts the shop creation process.\s
+                  &8- &f/shopmanager createproduct [ShopName] &7- Starts the product creation process.\s
+                  &8- &f/shopmanager deleteshop [ShopName] &7- Deletes the shop and the products- To delete a product, go to the shop gui and shift + right click the product.""";
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', helpMessage));
     }
 
@@ -38,65 +40,55 @@ public class ShopManagerCommand {
         sendHelp(sender);
     }
 
-    @Subcommand("reload")
-    public static void reload(CommandSender sender) {
-        BasicCustomShops.plugin.customReloadConfig();
-        sender.sendMessage(Messages.getMessage("&fReloaded Config!"));
-    }
-
-    @Subcommand("reloaddatabase")
+    @Subcommand("saveshops")
     public static void reloadDatabase(CommandSender sender) {
-        BasicCustomShops.plugin.shopManager.reloadDataService();
-        sender.sendMessage(Messages.getMessage("&fSaved all subshops and products to database!"));
+        BasicCustomShops.getInstance().shopManager.reloadDataService();
+        sender.sendMessage(Messages.getMessage("&fSaved all shops and products to database!"));
     }
 
-    @Subcommand("toggleshop")
-    public static void toggleShop(CommandSender sender) {
-        if (BasicCustomShops.plugin.shopIsEnabled) {
-            BasicCustomShops.plugin.changeShopBoolean(false);
-            sender.sendMessage(Messages.getMessage("&fToggled shop to &cDisabled&f."));
-        } else {
-            BasicCustomShops.plugin.changeShopBoolean(true);
-            sender.sendMessage(Messages.getMessage("&fToggled shop to &aEnabled&f."));
-        }
-    }
-
-    @Subcommand("createsubshop")
+    @Subcommand("createshop")
     public static void createSubShop(CommandSender sender, @AStringArgument String name) {
         if (sender instanceof ConsoleCommandSender) {
             sender.sendMessage(Messages.getMessage("&cOnly players can use this command!"));
             return;
         }
-        if (Shop.isSubshopNameTaken(name)) {
+        if (BasicCustomShops.getInstance().shopManager.getShopFromName(name) != null) {
             sender.sendMessage(Messages.getMessage("&cThis name is taken! Please use another name."));
             return;
         }
         Player player = (Player) sender;
-        SubShopCreation.addPlayer(player, name);
+        ShopAdmin shopAdmin = new ShopAdmin(player, name);
+        BasicCustomShops.getInstance().shopManager.addAdmin(shopAdmin);
+        ShopCreator.getInstance().addPlayer(player, ShopCreator.CreatingType.SHOP);
+        PlayerTracking.updatePlayerStatus(player.getUniqueId(), PlayerTracking.PlayerStatus.CREATINGSHOP);
     }
 
     @Subcommand("createproduct")
-    public static void createProduct(CommandSender sender, @AStringArgument String SubShopName) {
+    public static void createProduct(CommandSender sender, @AStringArgument String shopName) {
         if (sender instanceof ConsoleCommandSender) {
             sender.sendMessage(Messages.getMessage("&cOnly players can use this command!"));
             return;
         }
-        if (!Shop.isSubshopNameTaken(SubShopName)) {
+        if (BasicCustomShops.getInstance().shopManager.getShopFromName(shopName) != null) {
             sender.sendMessage(Messages.getMessage("&cThis name is not a name of a subshop!"));
             return;
         }
         Player player = (Player) sender;
-        ProductCreation.addPlayer(player, SubShopName);
+        ShopAdmin shopAdmin = new ShopAdmin(player, shopName);
+        BasicCustomShops.getInstance().shopManager.addAdmin(shopAdmin);
+        ShopCreator.getInstance().addPlayer(player, ShopCreator.CreatingType.PRODUCT);
+        PlayerTracking.updatePlayerStatus(player.getUniqueId(), PlayerTracking.PlayerStatus.CREATINGPRODUCT);
     }
 
-    @Subcommand("deletesubshop")
-    public static void deleteSubShop(CommandSender sender, @AStringArgument String SubShopName) {
-        if (!Shop.isSubshopNameTaken(SubShopName)) {
+    @Subcommand("deleteshop")
+    public static void deleteSubShop(CommandSender sender, @AStringArgument String shopName) {
+        Shop shop = BasicCustomShops.getInstance().shopManager.getShopFromName(shopName);
+        if (shop == null) {
             sender.sendMessage(Messages.getMessage("&cThis name is not a name of a subshop!"));
             return;
         }
-        Shop.removeSubShop(SubShopName);
-        sender.sendMessage(Messages.getMessage("&fDeleted &c" + SubShopName + "&f."));
+        BasicCustomShops.getInstance().shopManager.removeShop(shop);
+        sender.sendMessage(Messages.getMessage("&fDeleted &c" + shop.getName() + "&f."));
     }
 
 

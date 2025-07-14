@@ -15,31 +15,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class BasicCustomShops extends JavaPlugin {
 
-    public String messagePrefix = getConfig().getString("message-prefix");
+    private static BasicCustomShops instance;
 
-    public static BasicCustomShops plugin;
+    public static BasicCustomShops getInstance() {
+        return instance;
+    }
+
+    public String getMessagePrefix() {
+        return getConfig().getString("message-prefix");
+    }
+
 
     private DataService dataService;
     public ShopManager shopManager;
-
-
-    public void customReloadConfig() {
-        saveDefaultConfig();
-        reloadConfig();
-        messagePrefix = getConfig().getString("message-prefix");
-    }
-
-    public boolean shopIsEnabled;
-
-    public void changeShopBoolean(boolean bool) {
-        shopIsEnabled = bool;
-        getConfig().set("shop-enabled", bool);
-        saveConfig();
-        reloadConfig();
-    }
-
-
-
 
     @Override
     public void onLoad() {
@@ -47,16 +35,15 @@ public final class BasicCustomShops extends JavaPlugin {
         CommandAPI.onLoad(new CommandAPIBukkitConfig(this));
         if (!CommandAPI.isLoaded()) {
             getLogger().severe("CommandAPI is not loaded, contact developer.");
-            PluginManager pm = getServer().getPluginManager();
-            pm.disablePlugin(this);
+            PluginManager pluginManager = getServer().getPluginManager();
+            pluginManager.disablePlugin(this);
         }
     }
 
     @Override
     public void onEnable() {
-        plugin = this;
-        customReloadConfig();
-        shopIsEnabled = getConfig().getBoolean("shop-enabled");
+        instance = this;
+        saveDefaultConfig();
 
         dataService = new SQLiteDataService(this, new SQLiteHook());
         shopManager = new ShopManager(this, dataService);
@@ -65,8 +52,8 @@ public final class BasicCustomShops extends JavaPlugin {
         VaultHook.init();
         if (VaultHook.failedSetup) { // Checking if it failed
             getLogger().severe("Vault is either not on your server, or you don't have a vault economy plugin like Essentials to set up economy!");
-            PluginManager pm = getServer().getPluginManager();
-            pm.disablePlugin(this);
+            PluginManager pluginManager = getServer().getPluginManager();
+            pluginManager.disablePlugin(this);
             return;
         }
 
@@ -88,15 +75,15 @@ public final class BasicCustomShops extends JavaPlugin {
     }
 
     private void registerListeners() {
-        PluginManager pm = getServer().getPluginManager();
+        PluginManager pluginManager = getServer().getPluginManager();
 
-        pm.registerEvents(new MainShopClickListener(), this);
-        pm.registerEvents(new InventoryCloseListener(), this);
-        pm.registerEvents(new ShopClickListener(), this);
-        pm.registerEvents(new QuitListener(), this);
-        pm.registerEvents(new ShopCreatorListener(), this);
-        pm.registerEvents(new TransactionHandlerListener(), this);
-        pm.registerEvents(new ProductCreatorListener(), this);
+        pluginManager.registerEvents(new MainShopClickListener(), this);
+        pluginManager.registerEvents(new InventoryCloseListener(), this);
+        pluginManager.registerEvents(new ShopClickListener(), this);
+        pluginManager.registerEvents(new QuitListener(), this);
+        pluginManager.registerEvents(new ShopCreatorListener(), this);
+        pluginManager.registerEvents(new TransactionHandlerListener(), this);
+        pluginManager.registerEvents(new ProductCreatorListener(), this);
     }
 
 

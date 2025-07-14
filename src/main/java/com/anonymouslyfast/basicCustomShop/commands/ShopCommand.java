@@ -2,6 +2,8 @@ package com.anonymouslyfast.basicCustomShop.commands;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.shop.Customer;
+import com.anonymouslyfast.basicCustomShop.shop.PlayerTracking;
+import com.anonymouslyfast.basicCustomShop.shop.ShopManager;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import dev.jorel.commandapi.annotations.Command;
 import dev.jorel.commandapi.annotations.Default;
@@ -12,10 +14,12 @@ import org.bukkit.inventory.Inventory;
 @Command("shop")
 public class ShopCommand {
 
+    private static final ShopManager shopManager = BasicCustomShops.getInstance().shopManager;
+
     @Default
     public static void shop(CommandSender sender) {
         // Checking if shop is enabled for normal players.
-        if (!BasicCustomShops.getInstance().shopIsEnabled && !sender.hasPermission("BCS.shopmanager")) {
+        if (!shopManager.isShopEnabled() && !sender.hasPermission("BCS.shopmanager")) {
             sender.sendMessage(Messages.getMessage("&7Shop is Disabled!"));
             return;
         }
@@ -25,13 +29,13 @@ public class ShopCommand {
             return;
         }
 
-        Customer customer;
-        if (Shop.getCustomer(player.getUniqueId()) != null) customer = Shop.getCustomer(player.getUniqueId());
-        else customer = new Customer(player.getUniqueId());
+        Customer customer = shopManager.getCustomerByUUID(player.getUniqueId());
+        if (customer == null) new Customer(player.getUniqueId(), PlayerTracking.PlayerStatus.INMAINSHOPGUI);
 
-        Shop.addCustomer(customer);
-        Inventory inventory = Shop.getShopInventory(player);
+        Inventory inventory = customer.getInventory();
+        if (inventory == null) shopManager.getMainInventory(player.getUniqueId(), 1);
+
         customer.switchInventory(inventory);
+        shopManager.addCustomer(customer);
     }
-
 }

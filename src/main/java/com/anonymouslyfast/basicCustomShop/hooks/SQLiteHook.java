@@ -19,7 +19,7 @@ public class SQLiteHook {
     public void init(BasicCustomShops plugin) {
         plugin.getLogger().info("Initializing SQLite");
         try {
-            File dbFile = new File(BasicCustomShops.plugin.getDataFolder() + "/database.db");
+            File dbFile = new File(BasicCustomShops.getInstance().getDataFolder() + "/database.db");
 
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getPath());
             Statement statement = connection.createStatement();

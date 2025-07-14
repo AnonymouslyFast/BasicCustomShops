@@ -27,6 +27,8 @@ public final class ShopManager {
         this.dataService = dataService;
     }
 
+    public boolean isShopEnabled() { return plugin.getConfig().getBoolean("shop-enabled"); }
+
     public void setShops(List<Shop> shops) {
         this.shops = shops;
         shopNames.clear();

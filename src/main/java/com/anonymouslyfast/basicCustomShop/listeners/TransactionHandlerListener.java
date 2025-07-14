@@ -3,6 +3,7 @@ package com.anonymouslyfast.basicCustomShop.listeners;
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.shop.Customer;
 import com.anonymouslyfast.basicCustomShop.shop.PlayerTracking;
+import com.anonymouslyfast.basicCustomShop.shop.ShopManager;
 import com.anonymouslyfast.basicCustomShop.shop.TransactionHandler;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.Bukkit;
@@ -15,7 +16,9 @@ import javax.annotation.Nullable;
 
 public class TransactionHandlerListener implements Listener {
 
-    private final BasicCustomShops plugin = BasicCustomShops.plugin;
+    private final BasicCustomShops instance = BasicCustomShops.getInstance();
+
+    private final ShopManager shopManager = instance.shopManager;
 
     @Nullable
     private Integer parseMessage(Player player, String message) {
@@ -28,7 +31,7 @@ public class TransactionHandlerListener implements Listener {
 
     private boolean triedToCancel(Player player, String message) {
         if (message.equalsIgnoreCase("cancel") || message.equalsIgnoreCase("exit")) {
-            Customer customer = plugin.shopManager.getCustomerByUUID(player.getUniqueId());
+            Customer customer = shopManager.getCustomerByUUID(player.getUniqueId());
             player.openInventory(customer.getInventory());
             player.sendMessage(Messages.getMessage("&cYou have cancelled the transaction."));
             PlayerTracking.updatePlayerStatus(player.getUniqueId(), PlayerTracking.PlayerStatus.INSHOPGUI);
@@ -40,7 +43,7 @@ public class TransactionHandlerListener implements Listener {
     @EventHandler
     public void onAsyncPlayerChat(AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
-        Customer customer = plugin.shopManager.getCustomerByUUID(player.getUniqueId());
+        Customer customer = shopManager.getCustomerByUUID(player.getUniqueId());
         if (customer == null) return;
 
         // Buying Multiple
@@ -52,7 +55,7 @@ public class TransactionHandlerListener implements Listener {
             if  (parsedMessage == null) return;
 
             TransactionHandler.buy(customer, customer.getProductInCart(), parsedMessage);
-            Bukkit.getScheduler().callSyncMethod(BasicCustomShops.plugin, () -> player.openInventory(customer.getInventory()));
+            Bukkit.getScheduler().callSyncMethod(instance, () -> player.openInventory(customer.getInventory()));
             PlayerTracking.updatePlayerStatus(player.getUniqueId(), PlayerTracking.PlayerStatus.INSHOPGUI);
 
         // Selling
@@ -64,7 +67,7 @@ public class TransactionHandlerListener implements Listener {
             if  (parsedMessage == null) return;
 
             TransactionHandler.sell(customer, customer.getProductInCart(), parsedMessage);
-            Bukkit.getScheduler().callSyncMethod(BasicCustomShops.plugin, () -> player.openInventory(customer.getInventory()));
+            Bukkit.getScheduler().callSyncMethod(instance, () -> player.openInventory(customer.getInventory()));
             PlayerTracking.updatePlayerStatus(player.getUniqueId(), PlayerTracking.PlayerStatus.INSHOPGUI);
         }
     }

@@ -4,6 +4,7 @@ import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.shop.ShopAdmin;
 import com.anonymouslyfast.basicCustomShop.shop.PlayerTracking;
 import com.anonymouslyfast.basicCustomShop.shop.Shop;
+import com.anonymouslyfast.basicCustomShop.shop.ShopManager;
 import com.anonymouslyfast.basicCustomShop.tools.Messages;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,15 +14,22 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.UUID;
+
 public class ShopCreatorListener implements Listener {
+
+    private final ShopManager shopManager = BasicCustomShops.getInstance().shopManager;
+
+    private boolean playerIsNotCreatingShop(UUID playerUUID) {
+        return PlayerTracking.getPlayerStatus(playerUUID) != PlayerTracking.PlayerStatus.CREATINGSHOP;
+    }
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent e) {
-        if (PlayerTracking.getPlayerStatus(e.getPlayer().getUniqueId()) != PlayerTracking.PlayerStatus.CREATINGSHOP)
-            return;
+        if (playerIsNotCreatingShop(e.getPlayer().getUniqueId())) return;
 
         Player player = e.getPlayer();
-        ShopAdmin shopAdmin = BasicCustomShops.plugin.shopManager.getAdminByUUID(player.getUniqueId());
+        ShopAdmin shopAdmin = shopManager.getAdminByUUID(player.getUniqueId());
         if (shopAdmin == null) return;
         if (shopAdmin.getShopName() == null) return;
 
@@ -34,8 +42,8 @@ public class ShopCreatorListener implements Listener {
 
             ItemStack item = e.getItem();
             Shop shop = new Shop(shopAdmin.getShopName(), item.getType());
-            BasicCustomShops.plugin.shopManager.addShop(shop);
-            BasicCustomShops.plugin.shopManager.removeAdmin(shopAdmin);
+            shopManager.addShop(shop);
+            shopManager.removeAdmin(shopAdmin);
             PlayerTracking.removePlayer(player.getUniqueId());
             player.sendMessage(Messages.getMessage("&aCreated the shop &f" + shop.getName() + "&a."));
         }
@@ -43,16 +51,15 @@ public class ShopCreatorListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
-        if (PlayerTracking.getPlayerStatus(e.getPlayer().getUniqueId()) != PlayerTracking.PlayerStatus.CREATINGSHOP)
-            return;
+        if (playerIsNotCreatingShop(e.getPlayer().getUniqueId())) return;
 
         Player player = e.getPlayer();
-        ShopAdmin shopAdmin = BasicCustomShops.plugin.shopManager.getAdminByUUID(player.getUniqueId());
+        ShopAdmin shopAdmin = shopManager.getAdminByUUID(player.getUniqueId());
         if (shopAdmin == null) return;
         if (shopAdmin.getShopName() == null) return;
         if (e.getMessage().equalsIgnoreCase("cancel") || e.getMessage().equalsIgnoreCase("exit")) {
             e.setCancelled(true);
-            BasicCustomShops.plugin.shopManager.removeAdmin(shopAdmin);
+            shopManager.removeAdmin(shopAdmin);
             PlayerTracking.removePlayer(player.getUniqueId());
             player.sendMessage(Messages.getMessage("&aRemoved you from the shop creator."));
         }
