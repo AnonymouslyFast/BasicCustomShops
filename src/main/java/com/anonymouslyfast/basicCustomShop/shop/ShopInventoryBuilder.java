@@ -110,16 +110,26 @@ public final class ShopInventoryBuilder {
             for (int i = 0; i < shops.size(); i++) {
                 if (i >= startIndex && passedLoops < subShopSlots.size()) {
                     Shop shop = shops.get(i);
+                    if (!shop.isEnabled() && !isAdmin) continue;
+
                     ItemStack itemStack = new ItemStack(shop.getIcon());
                     ItemMeta meta = itemStack.getItemMeta();
                     assert meta != null;
+
+                    String visibility = "&7(Visible)";
+                    if (!shop.isEnabled()) visibility = "&7(Hidden)";
+
                     meta.setDisplayName(MessageUtils.convertCodes(shop.getName()));
+                    if (isAdmin) meta.setDisplayName(MessageUtils.convertCodes(shop.getName() + " " + visibility));
+
                     List<String> lore = new ArrayList<>();
                     lore.add(MessageUtils.convertCodes("&7Click to open this shop."));
                     if (isAdmin) lore.add(MessageUtils.convertCodes("&cShift + Right click to &ldelete&c."));
                     meta.setLore(lore);
+
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                     itemStack.setItemMeta(meta);
+
                     inventory.setItem(subShopSlots.get(passedLoops), itemStack);
                     customer.addShopSlot(subShopSlots.get(passedLoops), shop.getName());
                     passedLoops++;

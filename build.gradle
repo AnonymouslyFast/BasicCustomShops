@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.anonymouslyfast'
-version = '2.0'
+version = '2.1'
 
 repositories {
     mavenCentral()
@@ -78,4 +78,10 @@ tasks {
         }
         minecraftVersion("1.21")
     }
+}
+
+tasks.register("buildPlugin", ShadowJar) {
+    archiveClassifier.set('')
+    from sourceSets.main.output
+    configurations = [project.configurations.runtimeClasspath]
 }

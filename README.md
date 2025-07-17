@@ -17,6 +17,7 @@ This plugin is mainly configured by commands to do stuff like reloading, and cre
 /shopmanager createshop <String> - creates a shop with the given name
 /shopmanager createproduct <String> - puts you in a product creation tool that will guide you through creating a product for the given shop.
 /subshop deleteshop <String> - deletes the given shop
+/shopmanager togglevisibility <String> &7- Toggles whether the given shop is visable or hidden to the public.
 ```
 
 ## GUI Actions

@@ -1,5 +1,5 @@
 name: BasicCustomShops
-version: '2.0'
+version: '2.1'
 main: com.anonymouslyfast.basicCustomShop.BasicCustomShops
 api-version: '1.21'
 prefix: BasicCustomShops

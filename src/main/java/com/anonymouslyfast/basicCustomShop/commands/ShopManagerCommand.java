@@ -27,7 +27,9 @@ public class ShopManagerCommand {
                   &8- &f/shopmanager saveshops &7- saves all shops and products to database\s
                   &8- &f/shopmanager createshop [ShopName] &7- Starts the shop creation process.\s
                   &8- &f/shopmanager createproduct [ShopName] &7- Starts the product creation process.\s
-                  &8- &f/shopmanager deleteshop [ShopName] &7- Deletes the shop and the products- To delete a product, go to the shop gui and shift + right click the product.""";
+                  &8- &f/shopmanager deleteshop [ShopName] &7- Deletes the shop and the products- To delete a product, go to the shop gui and shift + right click the product.\s
+                  &8- &f/shopmanager togglevisibility [ShopName] &7- Toggles whether the shop is visable or hidden to the public.""";
+
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', helpMessage));
     }
 
@@ -90,6 +92,23 @@ public class ShopManagerCommand {
         }
         BasicCustomShops.getInstance().shopManager.removeShop(shop);
         sender.sendMessage(MessageUtils.getMessage("&fDeleted &c" + shop.getName() + "&f."));
+    }
+
+    @Subcommand("togglevisibility")
+    public static void toggleVisability(CommandSender sender, @AStringArgument String shopName) {
+        Shop shop = BasicCustomShops.getInstance().shopManager.getShopFromName(shopName);
+        if (shop == null) {
+            sender.sendMessage(MessageUtils.getMessage("&cThis name is not a name of a shop!"));
+            return;
+        }
+
+        if (shop.isEnabled()) {
+            sender.sendMessage(MessageUtils.getMessage("&aSuccessfully set this shop to &chidden&a!"));
+            shop.setEnabled(false);
+        } else {
+            sender.sendMessage(MessageUtils.getMessage("&aSuccessfully set this shop to &2visible&a!"));
+            shop.setEnabled(true);
+        }
     }
 
 
