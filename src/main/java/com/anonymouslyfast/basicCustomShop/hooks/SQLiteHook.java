@@ -25,19 +25,20 @@ public class SQLiteHook {
             Statement statement = connection.createStatement();
 
             String subshopQuery = """
-                CREATE TABLE IF NOT EXISTS `subshops` (
+                CREATE TABLE IF NOT EXISTS `shops` (
                     name TEXT NOT NULL,
+                    is_enabled BOOLEAN NOT NULL,
                     uuid TEXT NOT NULL PRIMARY KEY,
                     icon_material TEXT NOT NULL
                 );""";
             String productsQuery = """
                 CREATE TABLE IF NOT EXISTS `products` (
-                    subshop_uuid TEXT NOT NULL,
+                    shop_uuid TEXT NOT NULL,
                     uuid TEXT NOT NULL PRIMARY KEY,
                     material TEXT NOT NULL,
                     buy_price REAL NOT NULL,
                     sell_price REAL,
-                    FOREIGN KEY(subshop_uuid) REFERENCES subshops(uuid)
+                    FOREIGN KEY(shop_uuid) REFERENCES shops(uuid)
                 );""";
 
             statement.executeUpdate(subshopQuery);
@@ -49,12 +50,12 @@ public class SQLiteHook {
         }
     }
 
-    public Connection getConnection() {
-        return connection;
-    }
-
     public boolean failedSetup() {
         return failedSetup;
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 
 }

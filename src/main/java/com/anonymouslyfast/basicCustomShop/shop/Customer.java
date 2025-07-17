@@ -15,7 +15,6 @@ public class Customer {
 
     private Product productInCart;
 
-
     private Integer page;
 
     private Shop openedShop;
@@ -35,13 +34,7 @@ public class Customer {
         PlayerTracking.addPlayer(playerUUID, playerStatus);
     }
 
-    public UUID getPlayerUUID() {
-        return playerUUID;
-    }
 
-    public Inventory getInventory() {
-        return inventory;
-    }
 
     public void switchInventory(Inventory inventory) {
         this.inventory = inventory;
@@ -49,37 +42,25 @@ public class Customer {
         Bukkit.getScheduler().callSyncMethod(BasicCustomShops.getInstance(), () -> Bukkit.getPlayer(playerUUID).openInventory(inventory));
     }
 
-    public Shop getShopFromSlot(Integer slot) {
-        return BasicCustomShops.getInstance().shopManager.getShopFromName(shopSlots.get(slot));
+    public boolean isSwitchingInventory() {
+        return PlayerTracking.getPlayerStatus(playerUUID) == PlayerTracking.PlayerStatus.SWITCHINGINVENTORY;
     }
 
-    public void addShopSlot(Integer slot, String subShop) {
-        shopSlots.put(slot, subShop);
+
+    public void addShopSlot(Integer slot, String shopName) {
+        shopSlots.put(slot, shopName);
     }
 
     public void clearSubShopSlots() {
         shopSlots.clear();
-    }
-    
-
-    public Integer getPage() {
-        return page;
     }
 
     public void setPage(Integer page) {
         this.page = page;
     }
 
-    public Shop getOpenedShop() {
-        return openedShop;
-    }
-
     public void setOpenedShop(@Nullable Shop openedShop) {
         this.openedShop = openedShop;
-    }
-
-    public HashMap<Integer, Product> getProductSlots() {
-        return productSlots;
     }
 
     public void addProductSlot(Integer slot, Product product) {
@@ -90,17 +71,29 @@ public class Customer {
         productSlots.clear();
     }
 
-    public boolean isSwitchingInventory() {
-        return PlayerTracking.getPlayerStatus(playerUUID) == PlayerTracking.PlayerStatus.SWITCHINGINVENTORY;
-    }
     public void setProductInCart(Product productInCart) {
         this.productInCart = productInCart;
     }
 
-    public Product getProductInCart() {
-        return productInCart;
-    }
     public void clearCart() {
         this.productInCart = null;
+    }
+
+    public UUID getPlayerUUID() {
+        return playerUUID;
+    }
+    public Inventory getInventory() {
+        return inventory;
+    }
+    public Shop getShopFromSlot(Integer slot) { return BasicCustomShops.getInstance().shopManager.getShopFromName(shopSlots.get(slot)); }
+    public Integer getPage() { return page; }
+    public Shop getOpenedShop() {
+        return openedShop;
+    }
+    public HashMap<Integer, Product> getProductSlots() {
+        return productSlots;
+    }
+    public Product getProductInCart() {
+        return productInCart;
     }
 }

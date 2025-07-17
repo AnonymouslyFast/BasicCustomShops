@@ -1,9 +1,9 @@
-package com.anonymouslyfast.basicCustomShop.tools;
+package com.anonymouslyfast.basicCustomShop.utils;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import org.bukkit.ChatColor;
 
-public class Messages {
+public class MessageUtils {
 
     public static String convertCodes(String msg) {
         return ChatColor.translateAlternateColorCodes('&', msg);

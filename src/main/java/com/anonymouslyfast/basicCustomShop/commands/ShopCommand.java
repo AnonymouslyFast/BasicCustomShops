@@ -4,7 +4,7 @@ import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.shop.Customer;
 import com.anonymouslyfast.basicCustomShop.shop.PlayerTracking;
 import com.anonymouslyfast.basicCustomShop.shop.ShopManager;
-import com.anonymouslyfast.basicCustomShop.tools.Messages;
+import com.anonymouslyfast.basicCustomShop.utils.MessageUtils;
 import dev.jorel.commandapi.annotations.Command;
 import dev.jorel.commandapi.annotations.Default;
 import org.bukkit.command.CommandSender;
@@ -20,22 +20,28 @@ public class ShopCommand {
     public static void shop(CommandSender sender) {
         // Checking if shop is enabled for normal players.
         if (!shopManager.isShopEnabled() && !sender.hasPermission("BCS.shopmanager")) {
-            sender.sendMessage(Messages.getMessage("&7Shop is Disabled!"));
+            sender.sendMessage(MessageUtils.getMessage("&7Shop is Disabled!"));
             return;
         }
         // Checking if console
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Messages.getMessage("&cOnly players can use this command!"));
+            sender.sendMessage(MessageUtils.getMessage("&cOnly players can use this command!"));
             return;
         }
 
         Customer customer = shopManager.getCustomerByUUID(player.getUniqueId());
-        if (customer == null) new Customer(player.getUniqueId(), PlayerTracking.PlayerStatus.INMAINSHOPGUI);
+        if (customer == null) {
+            customer = new Customer(player.getUniqueId(), PlayerTracking.PlayerStatus.INMAINSHOPGUI);
+            shopManager.addCustomer(customer);
+        }
 
         Inventory inventory = customer.getInventory();
-        if (inventory == null) shopManager.getMainInventory(player.getUniqueId(), 1);
-
-        customer.switchInventory(inventory);
-        shopManager.addCustomer(customer);
+        if (inventory == null) {
+            inventory = shopManager.getMainInventory(player.getUniqueId(), 1);
+            customer.setPage(1);
+            customer.switchInventory(inventory);
+        } else {
+            player.openInventory(inventory);
+        }
     }
 }

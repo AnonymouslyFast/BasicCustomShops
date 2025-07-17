@@ -18,6 +18,8 @@ public class InventoryCloseListener implements Listener {
         Player player = (Player) event.getPlayer();
         Customer customer = shopManager.getCustomerByUUID(player.getUniqueId());
         if (customer == null) return;
+        if (PlayerTracking.getPlayerStatus(player.getUniqueId()) == PlayerTracking.PlayerStatus.BUYINGMULTIPLE ||
+                PlayerTracking.getPlayerStatus(player.getUniqueId()) == PlayerTracking.PlayerStatus.SELLING) return;
         if (customer.isSwitchingInventory()) {
             PlayerTracking.PlayerStatus status;
             if (customer.getOpenedShop() != null) {
@@ -28,6 +30,7 @@ public class InventoryCloseListener implements Listener {
         }
 
         if (PlayerTracking.getPlayerStatus(customer.getPlayerUUID()) == null) return;
+        PlayerTracking.removePlayer(player.getUniqueId());
         shopManager.removeCustomer(customer);
     }
 

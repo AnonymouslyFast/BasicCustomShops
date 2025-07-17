@@ -2,7 +2,7 @@ package com.anonymouslyfast.basicCustomShop.listeners;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.shop.*;
-import com.anonymouslyfast.basicCustomShop.tools.Messages;
+import com.anonymouslyfast.basicCustomShop.utils.MessageUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +21,7 @@ public class MainShopClickListener implements Listener {
         Customer customer = shopManager.getCustomerByUUID(event.getWhoClicked().getUniqueId());
         if (customer == null) return;
         String title = shopManager.getInventoryName(null, customer.getPage());
-        if (!event.getView().getTitle().equals(Messages.convertCodes(title))) return;
+        if (!event.getView().getTitle().equals(MessageUtils.convertCodes(title))) return;
         event.setCancelled(true);
 
         Player player = (Player) event.getWhoClicked();
@@ -46,7 +46,7 @@ public class MainShopClickListener implements Listener {
         // Deleting Shop
         if (event.getClick() == ClickType.SHIFT_RIGHT && player.hasPermission("BCS.shopmanager")) {
             shopManager.removeShop(clickedShop);
-            player.sendMessage(Messages.convertCodes("&fDeleted 77" + clickedShop.getName() + "&f."));
+            player.sendMessage(MessageUtils.convertCodes("&fDeleted 77" + clickedShop.getName() + "&f."));
             customer.switchInventory(shopManager.getMainInventory(player.getUniqueId(), customer.getPage()));
             return;
         }
@@ -55,6 +55,7 @@ public class MainShopClickListener implements Listener {
         Inventory shopInventory = new ShopInventoryBuilder(player.getUniqueId(), newTitle)
                 .buildShopInventory(clickedShop, 1);
         customer.switchInventory(shopInventory);
+        customer.setOpenedShop(clickedShop);
     }
 
 

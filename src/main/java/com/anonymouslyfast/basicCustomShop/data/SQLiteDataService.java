@@ -33,22 +33,24 @@ public final class SQLiteDataService implements DataService {
     }
 
     @Override
-    public void loadSubShops() {
+    public void loadShops() {
         List<Shop> shops = new ArrayList<>();
         try {
             // Getting all subshop indexes and looping through them.
-            ResultSet subShopResults = sqLiteHook.getConnection().prepareStatement("SELECT * FROM subshops").executeQuery();
-            while (subShopResults.next()) {
-                String subShopName = subShopResults.getString("name");
-                UUID subShopUuid = UUID.fromString(subShopResults.getString("uuid"));
-                Material subShopIcon = Material.getMaterial(subShopResults.getString("icon_material"));
+            ResultSet shopResults = sqLiteHook.getConnection().prepareStatement("SELECT * FROM shops").executeQuery();
+            while (shopResults.next()) {
+                String shopName = shopResults.getString("name");
+                boolean isEnabled = shopResults.getBoolean("is_enabled");
+                UUID shopUuid = UUID.fromString(shopResults.getString("uuid"));
+                Material shopIcon = Material.getMaterial(shopResults.getString("icon_material"));
 
-                Shop shop = new Shop(subShopName, subShopIcon, subShopUuid);
+                Shop shop = new Shop(shopName, shopIcon, shopUuid);
+                shop.setEnabled(isEnabled);
 
                 // Getting all products of the subshop, and looping through them.
                 PreparedStatement statement =
-                        sqLiteHook.getConnection().prepareStatement("SELECT * FROM products WHERE subshop_uuid = ?");
-                statement.setString(1, subShopUuid.toString());
+                        sqLiteHook.getConnection().prepareStatement("SELECT * FROM products WHERE shop_uuid = ?");
+                statement.setString(1, shopUuid.toString());
                 ResultSet resultSet = statement.executeQuery();
 
                 List<Product> products = new ArrayList<>();
@@ -63,43 +65,44 @@ public final class SQLiteDataService implements DataService {
                 resultSet.close();
                 shops.add(shop);
             }
-            subShopResults.close();
+            shopResults.close();
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.WARNING, "Failed to load subshops.", e);
+            plugin.getLogger().log(Level.WARNING, "Failed to load shops.", e);
             return;
         }
         plugin.shopManager.setShops(shops);
-        plugin.getLogger().info("Loaded " + shops.size() + " subshops from database.");
+        plugin.getLogger().info("Loaded " + shops.size() + " shops from database.");
     }
 
     @Override
-    public void saveSubShops() {
+    public void saveShops() {
         for (Shop shop : plugin.shopManager.getShops()) {
-            boolean completed = saveSubShop(shop);
+            boolean completed = saveShop(shop);
             if (completed) continue;
-            plugin.getLogger().warning("Could not save subshop: " + shop.getName());
+            plugin.getLogger().warning("Could not save shop: " + shop.getName());
         }
-        plugin.getLogger().info("Saved " + plugin.shopManager.getShops().size() + " subshops to database.");
+        plugin.getLogger().info("Saved " + plugin.shopManager.getShops().size() + " shops to database.");
     }
 
     @Override
-    public boolean saveSubShop(Shop shop) {
+    public boolean saveShop(Shop shop) {
         try {
-            // Saving Shop to table subshops
+            // Saving Shop to table shops
             PreparedStatement statement = sqLiteHook.getConnection().prepareStatement(
-                    "INSERT OR REPLACE INTO subshops(name, uuid, icon_material) VALUES(?, ?, ?)"
+                    "INSERT OR REPLACE INTO shops(name, is_enabled, uuid, icon_material) VALUES(?, ?, ?, ?)"
             );
 
             statement.setString(1, shop.getName());
-            statement.setString(2, shop.getUuid().toString());
-            statement.setString(3, shop.getIcon().toString());
+            statement.setBoolean(2, shop.isEnabled());
+            statement.setString(3, shop.getUuid().toString());
+            statement.setString(4, shop.getIcon().toString());
             statement.execute();
             statement.close();
 
 
             // Saving Products to table products
             statement = sqLiteHook.getConnection().prepareStatement(
-                    "INSERT OR REPLACE INTO products(subshop_uuid, uuid, material, buy_price, sell_price) VALUES (?, ?, ?, ?, ?)"
+                    "INSERT OR REPLACE INTO products(shop_uuid, uuid, material, buy_price, sell_price) VALUES (?, ?, ?, ?, ?)"
             );
             statement.setString(1, shop.getUuid().toString());
 
@@ -113,17 +116,17 @@ public final class SQLiteDataService implements DataService {
             statement.close();
             return true;
         } catch (SQLException e) {
-           plugin.getLogger().log(Level.WARNING, "Failed to load save subshops.", e);
+           plugin.getLogger().log(Level.WARNING, "Failed to load save shops.", e);
         }
         return false;
     }
 
     @Override
-    public void removeSubShop(Shop shop) {
+    public void removeShop(Shop shop) {
         try {
-            // Deleting the subshop
+            // Deleting the shop
             PreparedStatement preparedStatement =  sqLiteHook.getConnection().prepareStatement(
-                    "DELETE FROM subshops WHERE uuid = ?"
+                    "DELETE FROM shops WHERE uuid = ?"
             );
             preparedStatement.setString(1, shop.getUuid().toString());
             preparedStatement.execute();
@@ -131,7 +134,7 @@ public final class SQLiteDataService implements DataService {
 
             // Deleting the products
             preparedStatement =  sqLiteHook.getConnection().prepareStatement(
-                    "DELETE FROM products WHERE subshop_uuid = ?"
+                    "DELETE FROM products WHERE shop_uuid = ?"
             );
             preparedStatement.setString(1, shop.getUuid().toString());
             preparedStatement.execute();
@@ -139,7 +142,7 @@ public final class SQLiteDataService implements DataService {
         } catch (SQLException exception) {
             plugin.getLogger().log(
                     Level.WARNING,
-                    "Failed to delete subshop:" + shop.getName() + ".",
+                    "Failed to delete shop:" + shop.getName() + ".",
                     exception
             );
         }

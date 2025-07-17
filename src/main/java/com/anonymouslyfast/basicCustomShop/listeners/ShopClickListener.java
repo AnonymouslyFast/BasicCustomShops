@@ -2,7 +2,7 @@ package com.anonymouslyfast.basicCustomShop.listeners;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.shop.*;
-import com.anonymouslyfast.basicCustomShop.tools.Messages;
+import com.anonymouslyfast.basicCustomShop.utils.MessageUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,7 +16,6 @@ public class ShopClickListener implements Listener {
 
     private final ShopManager shopManager = BasicCustomShops.getInstance().shopManager;
 
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
 
@@ -27,7 +26,7 @@ public class ShopClickListener implements Listener {
         Shop shop = customer.getOpenedShop();
         if (shop == null) return;
 
-        String title = Messages.convertCodes(shop.getName() + " &7(" + customer.getPage() + ")");
+        String title = MessageUtils.convertCodes(shop.getName() + " &7(" + customer.getPage() + ")");
         if (!player.getOpenInventory().getTitle().equals(title)) { player.closeInventory(); return; }
         event.setCancelled(true);
 
@@ -63,18 +62,22 @@ public class ShopClickListener implements Listener {
             TransactionHandler.buy(customer, product);
         // Buying multiple product
         } else if (event.getClick() == ClickType.SHIFT_LEFT) {
-            PlayerTracking.updatePlayerStatus(UUID.randomUUID(), PlayerTracking.PlayerStatus.BUYINGMULTIPLE);
+            PlayerTracking.updatePlayerStatus(player.getUniqueId(), PlayerTracking.PlayerStatus.BUYINGMULTIPLE);
             customer.setProductInCart(product);
             player.closeInventory();
+            player.sendMessage(MessageUtils.getMessage("&fPlease send a integer above 0 of how many " +
+                    product.getMaterial() + " you would like to buy. Otherwise, enter &7`cancel` &for &7`exit` to leave this."));
         // Selling product
-        } else if (event.getClick() == ClickType.RIGHT) {
-            PlayerTracking.updatePlayerStatus(UUID.randomUUID(), PlayerTracking.PlayerStatus.SELLING);
+        } else if (event.getClick() == ClickType.RIGHT && product.isSellable()) {
+            PlayerTracking.updatePlayerStatus(player.getUniqueId(), PlayerTracking.PlayerStatus.SELLING);
             customer.setProductInCart(product);
             player.closeInventory();
+            player.sendMessage(MessageUtils.getMessage("&fPlease send a integer above 0 of how many " +
+                    product.getMaterial() + " you would like to sell. Otherwise, enter &7`cancel` &for &7`exit` to leave this."));
         // ADMIN: deleting product
         } else if (event.getClick() == ClickType.SHIFT_RIGHT && player.hasPermission("BCS.shopmanager")) {
             shopManager.removeProduct(shop, product);
-            player.sendMessage(Messages.convertCodes("&fDeleted &7" + product.getMaterial().name() + "&f from &7" + shop.getName() + "&f."));
+            player.sendMessage(MessageUtils.convertCodes("&fDeleted &7" + product.getMaterial().name() + "&f from &7" + shop.getName() + "&f."));
             String newTitle = shopManager.getInventoryName(shop, customer.getPage());
             customer.switchInventory(new ShopInventoryBuilder(player.getUniqueId(), newTitle)
                     .buildShopInventory(shop, customer.getPage())

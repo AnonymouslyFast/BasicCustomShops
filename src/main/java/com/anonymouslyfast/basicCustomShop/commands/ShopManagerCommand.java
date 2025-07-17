@@ -5,7 +5,7 @@ import com.anonymouslyfast.basicCustomShop.shop.PlayerTracking;
 import com.anonymouslyfast.basicCustomShop.shop.Shop;
 import com.anonymouslyfast.basicCustomShop.shop.ShopAdmin;
 import com.anonymouslyfast.basicCustomShop.shop.ShopCreator;
-import com.anonymouslyfast.basicCustomShop.tools.Messages;
+import com.anonymouslyfast.basicCustomShop.utils.MessageUtils;
 import dev.jorel.commandapi.annotations.Command;
 import dev.jorel.commandapi.annotations.Default;
 import dev.jorel.commandapi.annotations.Permission;
@@ -43,17 +43,17 @@ public class ShopManagerCommand {
     @Subcommand("saveshops")
     public static void reloadDatabase(CommandSender sender) {
         BasicCustomShops.getInstance().shopManager.reloadDataService();
-        sender.sendMessage(Messages.getMessage("&fSaved all shops and products to database!"));
+        sender.sendMessage(MessageUtils.getMessage("&fSaved all shops and products to database!"));
     }
 
     @Subcommand("createshop")
-    public static void createSubShop(CommandSender sender, @AStringArgument String name) {
+    public static void createShop(CommandSender sender, @AStringArgument String name) {
         if (sender instanceof ConsoleCommandSender) {
-            sender.sendMessage(Messages.getMessage("&cOnly players can use this command!"));
+            sender.sendMessage(MessageUtils.getMessage("&cOnly players can use this command!"));
             return;
         }
         if (BasicCustomShops.getInstance().shopManager.getShopFromName(name) != null) {
-            sender.sendMessage(Messages.getMessage("&cThis name is taken! Please use another name."));
+            sender.sendMessage(MessageUtils.getMessage("&cThis name is taken! Please use another name."));
             return;
         }
         Player player = (Player) sender;
@@ -66,29 +66,30 @@ public class ShopManagerCommand {
     @Subcommand("createproduct")
     public static void createProduct(CommandSender sender, @AStringArgument String shopName) {
         if (sender instanceof ConsoleCommandSender) {
-            sender.sendMessage(Messages.getMessage("&cOnly players can use this command!"));
+            sender.sendMessage(MessageUtils.getMessage("&cOnly players can use this command!"));
             return;
         }
-        if (BasicCustomShops.getInstance().shopManager.getShopFromName(shopName) != null) {
-            sender.sendMessage(Messages.getMessage("&cThis name is not a name of a subshop!"));
+        if (BasicCustomShops.getInstance().shopManager.getShopFromName(shopName) == null) {
+            sender.sendMessage(MessageUtils.getMessage("&cThis name is not a name of a shop!"));
             return;
         }
         Player player = (Player) sender;
-        ShopAdmin shopAdmin = new ShopAdmin(player, shopName);
+
+        ShopAdmin shopAdmin = new ShopAdmin(player, BasicCustomShops.getInstance().shopManager.getShopFromName(shopName));
         BasicCustomShops.getInstance().shopManager.addAdmin(shopAdmin);
         ShopCreator.getInstance().addPlayer(player, ShopCreator.CreatingType.PRODUCT);
         PlayerTracking.updatePlayerStatus(player.getUniqueId(), PlayerTracking.PlayerStatus.CREATINGPRODUCT);
     }
 
     @Subcommand("deleteshop")
-    public static void deleteSubShop(CommandSender sender, @AStringArgument String shopName) {
+    public static void deleteShop(CommandSender sender, @AStringArgument String shopName) {
         Shop shop = BasicCustomShops.getInstance().shopManager.getShopFromName(shopName);
         if (shop == null) {
-            sender.sendMessage(Messages.getMessage("&cThis name is not a name of a subshop!"));
+            sender.sendMessage(MessageUtils.getMessage("&cThis name is not a name of a shop!"));
             return;
         }
         BasicCustomShops.getInstance().shopManager.removeShop(shop);
-        sender.sendMessage(Messages.getMessage("&fDeleted &c" + shop.getName() + "&f."));
+        sender.sendMessage(MessageUtils.getMessage("&fDeleted &c" + shop.getName() + "&f."));
     }
 
 

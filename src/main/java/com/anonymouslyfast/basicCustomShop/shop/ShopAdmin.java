@@ -24,6 +24,11 @@ public class ShopAdmin {
         this.shop = shop;
     }
 
+    public ShopAdmin(Player player, Shop shop) {
+        this.player = player;
+        this.shop = shop;
+    }
+
     public ShopAdmin(Player player, String shopName) {
         this.player = player;
         this.shopName = shopName;

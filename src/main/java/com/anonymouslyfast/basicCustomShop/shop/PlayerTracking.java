@@ -15,7 +15,13 @@ public final class PlayerTracking {
         SWITCHINGINVENTORY
     }
 
+
     private static final HashMap<UUID, PlayerStatus> playerStatuses = new HashMap<>();
+
+    public static void updatePlayerStatus(UUID uuid, PlayerStatus playerStatus) {
+        removePlayer(uuid);
+        addPlayer(uuid, playerStatus);
+    }
 
     public static void addPlayer(UUID uuid, PlayerStatus playerStatus) {
         playerStatuses.put(uuid, playerStatus);
@@ -25,11 +31,6 @@ public final class PlayerTracking {
     }
     public static PlayerStatus getPlayerStatus(UUID uuid) {
         return playerStatuses.get(uuid);
-    }
-
-    public static void updatePlayerStatus(UUID uuid, PlayerStatus playerStatus) {
-        removePlayer(uuid);
-        addPlayer(uuid, playerStatus);
     }
 
 }

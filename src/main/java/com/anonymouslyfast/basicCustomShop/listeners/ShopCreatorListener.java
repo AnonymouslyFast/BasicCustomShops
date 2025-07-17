@@ -5,7 +5,7 @@ import com.anonymouslyfast.basicCustomShop.shop.ShopAdmin;
 import com.anonymouslyfast.basicCustomShop.shop.PlayerTracking;
 import com.anonymouslyfast.basicCustomShop.shop.Shop;
 import com.anonymouslyfast.basicCustomShop.shop.ShopManager;
-import com.anonymouslyfast.basicCustomShop.tools.Messages;
+import com.anonymouslyfast.basicCustomShop.utils.MessageUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,10 +20,6 @@ public class ShopCreatorListener implements Listener {
 
     private final ShopManager shopManager = BasicCustomShops.getInstance().shopManager;
 
-    private boolean playerIsNotCreatingShop(UUID playerUUID) {
-        return PlayerTracking.getPlayerStatus(playerUUID) != PlayerTracking.PlayerStatus.CREATINGSHOP;
-    }
-
     @EventHandler
     public void onRightClick(PlayerInteractEvent e) {
         if (playerIsNotCreatingShop(e.getPlayer().getUniqueId())) return;
@@ -36,7 +32,7 @@ public class ShopCreatorListener implements Listener {
         if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             e.setCancelled(true);
             if (e.getItem() == null) {
-                player.sendMessage(Messages.getMessage("&cYou need to be holding a item in your hand."));
+                player.sendMessage(MessageUtils.getMessage("&cYou need to be holding a item in your hand."));
                 return;
             }
 
@@ -45,7 +41,7 @@ public class ShopCreatorListener implements Listener {
             shopManager.addShop(shop);
             shopManager.removeAdmin(shopAdmin);
             PlayerTracking.removePlayer(player.getUniqueId());
-            player.sendMessage(Messages.getMessage("&aCreated the shop &f" + shop.getName() + "&a."));
+            player.sendMessage(MessageUtils.getMessage("&aCreated the shop &f" + shop.getName() + "&a."));
         }
     }
 
@@ -61,8 +57,12 @@ public class ShopCreatorListener implements Listener {
             e.setCancelled(true);
             shopManager.removeAdmin(shopAdmin);
             PlayerTracking.removePlayer(player.getUniqueId());
-            player.sendMessage(Messages.getMessage("&aRemoved you from the shop creator."));
+            player.sendMessage(MessageUtils.getMessage("&aRemoved you from the shop creator."));
         }
+    }
+
+    private boolean playerIsNotCreatingShop(UUID playerUUID) {
+        return PlayerTracking.getPlayerStatus(playerUUID) != PlayerTracking.PlayerStatus.CREATINGSHOP;
     }
 
 }

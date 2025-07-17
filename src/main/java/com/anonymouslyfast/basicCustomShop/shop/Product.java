@@ -45,6 +45,11 @@ public class Product {
 
     public void setSellPrice(Double sellPrice) {this.sellPrice = sellPrice;}
     public Double getSellPrice() {return sellPrice;}
+    public boolean isSellable() {
+        boolean sellable = getSellPrice() != null;
+        if (sellable) sellable = getSellPrice() != 0d;
+        return sellable;
+    }
 
     public UUID getUuid() {
         return uuid;

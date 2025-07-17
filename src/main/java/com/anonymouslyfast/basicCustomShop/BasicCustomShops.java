@@ -17,15 +17,6 @@ public final class BasicCustomShops extends JavaPlugin {
 
     private static BasicCustomShops instance;
 
-    public static BasicCustomShops getInstance() {
-        return instance;
-    }
-
-    public String getMessagePrefix() {
-        return getConfig().getString("message-prefix");
-    }
-
-
     private DataService dataService;
     public ShopManager shopManager;
 
@@ -62,12 +53,26 @@ public final class BasicCustomShops extends JavaPlugin {
             CommandAPI.onEnable();
             registerCommands();
             registerListeners();
-            // Loading Subshops and Products from database
-            dataService.loadSubShops();
+            // Loading shops and Products from database
+            dataService.loadShops();
         }
 
 
     }
+
+    @Override
+    public void onDisable() {
+        if (CommandAPI.isLoaded()) {
+            CommandAPI.getRegisteredCommands().forEach(command ->
+                    CommandAPI.unregister(command.commandName())
+            );
+            getLogger().info("Unloaded registered commands. Disabling CommandAPI...");
+            CommandAPI.onDisable();
+        }
+        // Saving Shops and Products to Database
+        dataService.saveShops();
+    }
+
 
     private void registerCommands() {
         CommandAPI.registerCommand(ShopCommand.class);
@@ -87,19 +92,8 @@ public final class BasicCustomShops extends JavaPlugin {
     }
 
 
-    @Override
-    public void onDisable() {
-        if (CommandAPI.isLoaded()) {
-            CommandAPI.getRegisteredCommands().forEach(command ->
-                    CommandAPI.unregister(command.commandName())
-            );
-            getLogger().info("Unloaded registered commands. Disabling CommandAPI...");
-            CommandAPI.onDisable();
-        }
-        // Saving SubShops and Products to Database
-        dataService.saveSubShops();
-    }
+    public static BasicCustomShops getInstance() { return instance; }
 
-
+    public String getMessagePrefix() { return getConfig().getString("message-prefix"); }
 
 }

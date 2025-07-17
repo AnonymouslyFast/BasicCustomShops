@@ -4,9 +4,9 @@ import com.anonymouslyfast.basicCustomShop.shop.Product;
 import com.anonymouslyfast.basicCustomShop.shop.Shop;
 
 public interface DataService {
-    void loadSubShops();
-    void saveSubShops();
-    boolean saveSubShop(Shop shop);
-    void removeSubShop(Shop shop);
+    void loadShops();
+    void saveShops();
+    boolean saveShop(Shop shop);
+    void removeShop(Shop shop);
     void removeProduct(Product product);
 }

@@ -3,7 +3,7 @@ package com.anonymouslyfast.basicCustomShop.shop;
 
 import com.anonymouslyfast.basicCustomShop.BasicCustomShops;
 import com.anonymouslyfast.basicCustomShop.hooks.VaultHook;
-import com.anonymouslyfast.basicCustomShop.tools.Messages;
+import com.anonymouslyfast.basicCustomShop.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -28,28 +28,31 @@ public final class ShopInventoryBuilder {
     private final int informationSlot = 49;
     private final int nextPageSlot = 49;
 
-    private void fillInventory(Inventory inventory) {
-        for (int i = 0; i <  inventory.getSize(); i++) {
-            ItemStack fill = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-            ItemMeta meta = fill.getItemMeta();
-            assert meta != null;
-            meta.setDisplayName(Messages.convertCodes("&a "));
-            fill.setItemMeta(meta);
-            inventory.setItem(i, fill);
-        }
-    }
+    private final static int maxProductsPerPage = 28;
+    private final static int endOfContainer = 44;
+    private final static int startOfContainer = 10;
+
+    private final List<Integer> subShopSlots = List.of(10, 12, 14, 16, 19, 21, 23, 25, 28, 30, 32, 34, 36, 39, 41, 43);
 
     public ShopInventoryBuilder(UUID playerUUID, String title) {
-        inventory = Bukkit.createInventory(null, 54, Messages.convertCodes(title));
+        inventory = Bukkit.createInventory(null, 54, MessageUtils.convertCodes(title));
         isAdmin = Bukkit.getPlayer(playerUUID).hasPermission("BCS.shopmanager");
         this.playerUUID = playerUUID;
         fillInventory(inventory);
         inventory.setItem(informationSlot, getInformationItem(VaultHook.getBalance(Bukkit.getPlayer(playerUUID))));
     }
 
-    private final static int maxProductsPerPage = 28;
-    private final static int endOfContainer = 44;
-    private final static int startOfContainer = 10;
+
+    private void fillInventory(Inventory inventory) {
+        for (int i = 0; i <  inventory.getSize(); i++) {
+            ItemStack fill = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+            ItemMeta meta = fill.getItemMeta();
+            assert meta != null;
+            meta.setDisplayName(MessageUtils.convertCodes("&a "));
+            fill.setItemMeta(meta);
+            inventory.setItem(i, fill);
+        }
+    }
 
     public Inventory buildShopInventory(Shop shop, int page) {
         boolean requiresNextPage = (shop.getProducts().size() >= 1+(maxProductsPerPage*page));
@@ -65,16 +68,16 @@ public final class ShopInventoryBuilder {
 
                     ItemStack item = new ItemStack(product.getMaterial());
                     ItemMeta meta = item.getItemMeta();
+
                     if (meta != null) {
                         List<String> lore = new ArrayList<>();
-                        lore.add(Messages.convertCodes("&7Costs: &2&l$&f" + product.getPrice()));
-                        if (product.getSellPrice() != null) lore.add(Messages.convertCodes("&7Sell: &2&l$&f" + product.getSellPrice()));
-                        lore.add(Messages.convertCodes("&8&l&m-----------------"));
-                        lore.add(Messages.convertCodes("&7Left Click &fto buy."));
-                        lore.add(Messages.convertCodes("&7SHIFT + Left Click &fto buy multiple."));
-                        if (product.getSellPrice() != null || product.getSellPrice() == 0)
-                            lore.add(Messages.convertCodes("&7Right click &fto sell."));
-                        if (isAdmin) lore.add(Messages.convertCodes("&cShift + Right click to &ldelete&c."));
+                        lore.add(MessageUtils.convertCodes("&7Costs: &2&l$&f" + product.getPrice()));
+                        if (product.isSellable()) lore.add(MessageUtils.convertCodes("&7Sell: &2&l$&f" + product.getSellPrice()));
+                        lore.add(MessageUtils.convertCodes("&8&l&m-----------------"));
+                        lore.add(MessageUtils.convertCodes("&7Left Click &fto buy."));
+                        lore.add(MessageUtils.convertCodes("&7SHIFT + Left Click &fto buy multiple."));
+                        if (product.isSellable()) lore.add(MessageUtils.convertCodes("&7Right click &fto sell."));
+                        if (isAdmin) lore.add(MessageUtils.convertCodes("&cShift + Right click to &ldelete&c."));
                         meta.setLore(lore);
                         item.setItemMeta(meta);
                     }
@@ -97,8 +100,6 @@ public final class ShopInventoryBuilder {
         return inventory;
     }
 
-    private final List<Integer> subShopSlots = List.of(10, 12, 14, 16, 19, 21, 23, 25, 28, 30, 32, 34, 36, 39, 41, 43);
-
     public Inventory buildMainInventory(List<Shop> shops, int page) {
         boolean requiresNextPage = (shops.size() >= subShopSlots.size()*page);
         boolean requiresBackPage = page > 1;
@@ -112,10 +113,10 @@ public final class ShopInventoryBuilder {
                     ItemStack itemStack = new ItemStack(shop.getIcon());
                     ItemMeta meta = itemStack.getItemMeta();
                     assert meta != null;
-                    meta.setDisplayName(Messages.convertCodes(shop.getName()));
+                    meta.setDisplayName(MessageUtils.convertCodes(shop.getName()));
                     List<String> lore = new ArrayList<>();
-                    lore.add(Messages.convertCodes("&7Click to open this subshop."));
-                    if (isAdmin) lore.add(Messages.convertCodes("&cShift + Right click to &ldelete&c."));
+                    lore.add(MessageUtils.convertCodes("&7Click to open this shop."));
+                    if (isAdmin) lore.add(MessageUtils.convertCodes("&cShift + Right click to &ldelete&c."));
                     meta.setLore(lore);
                     meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                     itemStack.setItemMeta(meta);
@@ -139,14 +140,12 @@ public final class ShopInventoryBuilder {
     }
 
 
-
-
     private ItemStack getNextPageItem() {
         ItemStack itemStack = new ItemStack(Material.ARROW);
         ItemMeta meta = itemStack.getItemMeta();
         assert meta != null;
-        meta.setDisplayName(Messages.convertCodes("&a&lNext Page"));
-        meta.setLore(List.of(Messages.convertCodes("&7Click to go to the next page.")));
+        meta.setDisplayName(MessageUtils.convertCodes("&a&lNext Page"));
+        meta.setLore(List.of(MessageUtils.convertCodes("&7Click to go to the next page.")));
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -155,8 +154,8 @@ public final class ShopInventoryBuilder {
         ItemStack itemStack = new ItemStack(Material.STRUCTURE_VOID);
         ItemMeta meta = itemStack.getItemMeta();
         assert meta != null;
-        meta.setDisplayName(Messages.convertCodes("&c&lBack"));
-        meta.setLore(List.of(Messages.convertCodes("&7Click to go back to the previous page.")));
+        meta.setDisplayName(MessageUtils.convertCodes("&c&lBack"));
+        meta.setLore(List.of(MessageUtils.convertCodes("&7Click to go back to the previous page.")));
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -165,8 +164,8 @@ public final class ShopInventoryBuilder {
         ItemStack itemStack = new ItemStack(Material.NETHER_STAR);
         ItemMeta meta = itemStack.getItemMeta();
         assert meta != null;
-        meta.setDisplayName(Messages.convertCodes("&a&l Your Information"));
-        meta.setLore(List.of(Messages.convertCodes(" &2Balance: &2&l$&a" + playerBalance)));
+        meta.setDisplayName(MessageUtils.convertCodes("&a&l Your Information"));
+        meta.setLore(List.of(MessageUtils.convertCodes(" &2Balance: &2&l$&a" + playerBalance)));
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -175,8 +174,8 @@ public final class ShopInventoryBuilder {
         ItemStack itemStack = new ItemStack(Material.BARRIER);
         ItemMeta meta = itemStack.getItemMeta();
         assert meta != null;
-        meta.setDisplayName(Messages.convertCodes("&cGo back to shop."));
-        meta.setLore(List.of(Messages.convertCodes("&7Click to go back to shop.")));
+        meta.setDisplayName(MessageUtils.convertCodes("&cGo back to shop."));
+        meta.setLore(List.of(MessageUtils.convertCodes("&7Click to go back to shop.")));
         itemStack.setItemMeta(meta);
         return itemStack;
     }

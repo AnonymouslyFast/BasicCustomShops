@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.anonymouslyfast'
-version = '1.1'
+version = '2.0'
 
 repositories {
     mavenCentral()
@@ -65,12 +65,17 @@ processResources {
     }
 }
 
-tasks.named('runServer') {
-    minecraftVersion("1.21")
-}
+tasks {
+    build {
+        dependsOn(ShadowJar)
+    }
 
-tasks.register('buildPlugin', ShadowJar) {
-    archiveClassifier.set('')
-    from sourceSets.main.output
-    configurations = [project.configurations.runtimeClasspath]
+    runServer {
+        // Downloading Vault, and Essentials, Vault is required, and Essentials sets up the economy.
+        downloadPlugins {
+            url("https://dev.bukkit.org/projects/vault/files/latest")
+            url("https://ci.ender.zone/job/EssentialsX/lastSuccessfulBuild/artifact/jars/EssentialsX-2.21.2-dev+30-73da278.jar")
+        }
+        minecraftVersion("1.21")
+    }
 }

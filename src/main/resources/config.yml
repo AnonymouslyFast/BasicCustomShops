@@ -3,9 +3,5 @@
 # Message prefix for messages sent by this plugin.
 message-prefix: "&7[&a&lShop&2&lManager&7]" # Only can use Minecraft color codes.
 
-# Disabled this if you want the shop to be unusable by players
-# Will still work for operators- or anyone who has the command 'BCS.shopmanager'
-shop-enabled: true # Can be changed in-game as well using the /shopmanager command.
-
 # Shop Customization
 shop-title: "&a&lShop"
